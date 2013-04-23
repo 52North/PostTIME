@@ -5,3 +5,4 @@ latex
 .settings
 .project
 .cproject
+*.o
