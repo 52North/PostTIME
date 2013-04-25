@@ -408,12 +408,20 @@ pt_error_type regular_strings_to_ptime_instance(POSTTIME * ptime_tmp, char ** st
 			if( tcs_system == NULL ){
 				return TCS_SYSTEM_NOT_FOUND;
 			}
-			if( !parse_single_float( str_primitives[0] , &float_instant) ){
+			if( !parse_single_float( str_primitives[0] , &float_instant) ||
+				!parse_single_float( str_reg_parts[1] + 1 , &float_period_valid) ){
 				return CAN_NOT_PARSE_TCS_VALUE;
 			}
-			else {
-				ptime_tmp->data[1] = tcs_to_jday( &float_instant , tcs_system );
-				}
+			if( ptime_tmp->type == 6  ){
+				if(!parse_single_float( str_reg_parts[2] + 1, &float_period_invalid))
+				return CAN_NOT_PARSE_TCS_VALUE;
+			}
+			ptime_tmp->data[0] = (int64) int_r_value;
+			ptime_tmp->data[1] = tcs_to_jday( &float_instant , tcs_system);
+			ptime_tmp->data[2] = tcs_to_jday( &float_period_valid , tcs_system);
+			if(ptime_tmp->type == 6) {
+				ptime_tmp->data[3] = tcs_to_jday( &float_period_invalid , tcs_system);
+			}
 			break;
 		}
 	}

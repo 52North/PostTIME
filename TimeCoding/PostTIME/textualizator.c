@@ -139,16 +139,25 @@ void ptime_to_string_calendar( POSTTIME * ptime , char * str_out , int32 * int_c
 
 void ptime_to_string_tcs( POSTTIME * ptime , char * str_out , int32 * int_count ){
 	// TODO convert all JULIAN_DAYS in float8s
-	int32 i = 0;
+	int32 i = 0, ii = 0, int_bound = 0;
 	char period_sep = PERIOD_SEPARATOR;
 	char primitive_sep = PRIMITIVE_SEPARATOR;
 	coordinate_system * tcs_system = get_tcs_system_from_key( ptime->refsys.instance );
-	if( !tcs_system ) {
-		return; //TODO error handling.
+	char str_tmp[200];
+	if( ptime->type > 4 ) {
+		ii = 1;
+		if(ptime->type == 5) int_bound = 3;
+		else int_bound = 4;
+		char str_r[15];
+		sprintf( str_r , "R%d" , (int32) ptime->data[0] );
+		strcat(str_out,str_r);
+		strncat(str_out,&period_sep,1);
 	}
-	float8 * float_values = palloc(sizeof(float8) * *int_count);
-	memset( float_values , 0 , sizeof(float8) * *int_count);
-	for( i = 0 ; i < *int_count ; i++ ){
+	else int_bound = *int_count;
+
+	float8 * float_values = palloc(sizeof(float8) * int_bound);
+	memset( float_values , 0 , sizeof(float8) * int_bound);
+	for( i = ii ; i < int_bound ; i++ ){
 		float_values[i] = jday_to_tcs(&ptime->data[i], tcs_system);
 	}
 	switch(ptime->type){
@@ -177,6 +186,22 @@ void ptime_to_string_tcs( POSTTIME * ptime , char * str_out , int32 * int_count 
 			strncat(str_out,&period_sep,1);
 			julianday_cat_instantstring( &float_values[i+1] , str_out );
 		}
+		break;
+	case 5:
+		julianday_cat_instantstring( &float_values[1] , str_out );
+		strncat(str_out,&period_sep,1);
+		sprintf( str_tmp , "P%lf" , float_values[2] );
+		strcat( str_out , str_tmp );
+		break;
+	case 6:
+		julianday_cat_instantstring( &float_values[1] , str_out );
+		strncat( str_out , &period_sep,1);
+		sprintf( str_tmp , "P%lf" , float_values[2] );
+		strcat( str_out , str_tmp );
+		memset( str_tmp , 0 , 200 );
+		strncat(str_out,&period_sep,1);
+		sprintf( str_tmp , "P%lf" , float_values[3] );
+		strcat( str_out , str_tmp );
 		break;
 	}
 	FREE_MEM(float_values);
