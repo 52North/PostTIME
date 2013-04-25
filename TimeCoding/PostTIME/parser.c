@@ -124,6 +124,39 @@ pt_error_type determine_refsys(char * str_in, char *strs_out[], POSTTIME * ptime
 	return err_ret;
 }
 
+pt_error_type string_is_regular(POSTTIME * ptime_tmp, char * * str_primitives, char * * str_reg_parts){
+	char * buf = 0;
+	BYTE type = 0;
+	// char * buf_2 = 0; R12/instant/p222/p222
+	if( *str_primitives[0] != 'R' ) return EXPECTED_REGULAR_STR_IS_NOT_REGULAR;
+
+	str_reg_parts[0] = str_primitives[0]; // 12/...
+
+	str_primitives[0] = strchr( str_primitives[0] , REGULAR_SEPARATOR );
+	if( str_primitives[0] == str_reg_parts[0] ) return EXPECTED_REGULAR_STR_IS_NOT_REGULAR;
+	*(str_primitives[0]) = '\0';
+	str_primitives[0]++;
+	buf = strchr( str_primitives[0], REGULAR_SEPARATOR );
+	if( buf == 0 ) return EXPECTED_REGULAR_STR_IS_NOT_REGULAR;
+	*buf = '\0';
+	str_reg_parts[1] = buf + 1;
+
+	if( *str_reg_parts[1] != 'P' || str_reg_parts[1] ==  str_primitives[0]) return EXPECTED_REGULAR_STR_IS_NOT_REGULAR;
+	void * buf2 = strchr( str_reg_parts[1], REGULAR_SEPARATOR );
+	if( buf2 == (void*) 0 ){
+		type = 5;
+	}
+	else{
+		buf = strchr( str_reg_parts[1], REGULAR_SEPARATOR );
+		if( *(buf+1) != 'P' ) return EXPECTED_REGULAR_STR_IS_NOT_REGULAR;
+		str_reg_parts[2] = buf + 1;
+		*buf = '\0';
+		type = 6;
+	}
+	ptime_tmp->type = type;
+	return NO_ERROR;
+}
+
 /*!Convert a given string to a POSTTIME instance.
  * @param[in] str_in The given string.
  * @param[in] int_count Former calculated count of primitive candidates.
@@ -148,8 +181,26 @@ pt_error_type string_to_ptime(char * str_in, int32 * int_count, POSTTIME * ptime
 		// allocated char memory is needed later.
 		BYTE byte_instant_test = string_is_instant(str_primitives, str_primitives_end, &i);
 
-		if( !byte_instant_test ) ret_err = PERIOD_CAN_ONLY_CONTAIN_SINGLE_SLASH;
+		if( !byte_instant_test ) {
+			// TODO : at this Point the strings in str_primitives could
+			// contain a regularMultiObject. Check for validity and parse.
+			// could only be a tcs or calendarClock sys.
+			if(*int_count > 1) ret_err = PERIOD_CAN_ONLY_CONTAIN_SINGLE_SLASH;
+			else {
+				// str_reg_parts contains [0]=str_r_number, [1]str_p_valid, [2] str_p_invalid
+				char * * str_reg_parts = palloc(sizeof(char *) * 3 );
+				memset(str_reg_parts, 0 , sizeof(char *) * 3);
+				ret_err = string_is_regular(ptime_tmp, str_primitives, str_reg_parts);
+
+				if(ret_err == NO_ERROR) {
+					regular_strings_to_ptime_instance(ptime_tmp, str_primitives, str_reg_parts);
+				}
+				FREE_MEM(str_reg_parts);
+			}
+			// ret_err = PERIOD_CAN_ONLY_CONTAIN_SINGLE_SLASH;
+		}
 		else {
+
 			ptime_tmp->type = byte_instant_test;
 			for(i = 1; i< *int_count; i++){
 				BYTE byte_test = string_is_instant(str_primitives, str_primitives_end, &i);
@@ -162,16 +213,14 @@ pt_error_type string_to_ptime(char * str_in, int32 * int_count, POSTTIME * ptime
 					break;
 				}
 			}
-		}
-		if( ret_err == NO_ERROR ){
-			// ptime_tmp.type is 1 or 2.
-			// ptime_tmp.refsys is finally set.
-			ret_err = instant_strings_to_ptime_instants(int_count, ptime_tmp, str_primitives, str_primitives_end);
-
+			if( ret_err == NO_ERROR ){
+				// ptime_tmp.type is 1 or 2.
+				// ptime_tmp.refsys is finally set.
+				ret_err = instant_strings_to_ptime_instants(int_count, ptime_tmp, str_primitives, str_primitives_end);
+			}
 		}
 	}
 	FREE_MEM(str_primitives_end);
 	FREE_MEM(str_primitives);
-
 	return ret_err;
 }

@@ -30,6 +30,10 @@ const pt_error_msg pt_error_msgs[] = {
 		{ ORD_SYSTEM_NOT_FOUND ,
 		"An ordinal system with the given id is unknown."},
 		{ ORD_ERA_UNKNOWN ,
-		"The given ordinal-era-key is unknown in the specified system."}
+		"The given ordinal-era-key is unknown in the specified system."},
+		{ EXPECTED_REGULAR_STR_IS_NOT_REGULAR ,
+		"Assumed that the given string represents a RegularMultiObject, but is not valid in this way."},
+		{ INVALID_SYNTAX_AT_OR_NEAR_REGULAR_VALUE ,
+		"An error occurred during parsing the single regular values"	},
 };
 

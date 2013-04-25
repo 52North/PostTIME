@@ -1,3 +1,8 @@
 TimeCoding/.metadata
 Tests
 pg_extension_makefile/src/*.o
+pg_extension_makefile/PostTIMEtest.config
+pg_extension_makefile/logTest4PostTIME.log
+pg_extension_makefile/simpleQuerysSQL.txt
+pg_extension_makefile/test4ptime.jar
+pg_extension_makefile/test_script_make

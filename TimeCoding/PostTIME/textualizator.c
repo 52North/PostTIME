@@ -23,20 +23,67 @@ void date_numbers_to_instant_string(DATE_NUMBERS * dn, char * str_out){
 	strncat( str_out ,str_tmp, 27 );
 }
 
+// TODO comments.
+void dn_duration_to_string(DATE_NUMBERS * dn, char * str){
+	char str1[33];
+	memset( str1 , 0 , 33 );
+	sprintf(str1,"P");
+	strcat(str,str1);
+	if(dn->yea != 0){
+		sprintf(str1,"%dY",dn->yea);
+		strcat(str,str1);
+	}
+	if(dn->mon != 0){
+		sprintf(str1,"%dM",dn->mon);
+		strcat(str,str1);
+	}
+	if(dn->day != 0){
+		sprintf(str1,"%dD",dn->day);
+		strcat(str,str1);
+	}
+	if(dn->hou != 0 || dn->min != 0 || dn->sec != 0){
+		sprintf(str1,"T");
+		strcat(str,str1);
+	}
+	if(dn->hou != 0){
+		sprintf(str1,"%dH",dn->hou);
+		strcat(str,str1);
+	}
+	if(dn->min != 0){
+		sprintf(str1,"%dM",dn->min);
+		strcat(str,str1);
+	}
+	if(dn->sec != 0){
+		sprintf(str1,"%.3lfS",dn->sec);
+		strcat(str,str1);
+	}
+}
+
 void ptime_to_string_calendar( POSTTIME * ptime , char * str_out , int32 * int_count ){
 	int32 i = 0;
 	size_t size_needed;
 	size_needed =  sizeof(DATE_NUMBERS) * *int_count;
+	if(ptime->type == 5) size_needed = sizeof(DATE_NUMBERS) * 2;
+	else if(ptime->type == 6) size_needed = sizeof(DATE_NUMBERS) * 3;
 	char period_sep = PERIOD_SEPARATOR;
 	char primitive_sep = PRIMITIVE_SEPARATOR;
-
+	int32 rvalue = 0;
 	DATE_NUMBERS * dn_tmp = palloc( size_needed );
 	DATE_NUMBERS dn_0;
 	memset( dn_tmp , 0 , size_needed );
 	memset( &dn_0 , 0 , sizeof(DATE_NUMBERS) );
 	calendar_era * cal_system = get_system_from_key( ptime->refsys.instance );
-	if( !cal_system ) {
-		return; //TODO error handling.
+	if( ptime->type > 4 ) {
+		dn_0 = cal_system->jday_to_dnumbers( &(ptime->data[0]) );
+		memcpy(dn_tmp, &dn_0, sizeof(DATE_NUMBERS));
+		jday_pack_to_dn_period( dn_tmp + 1, (JULIAN_DAY *) &ptime->data[1], &rvalue);
+		if( ptime->type == 6 ) {
+			jday_pack_to_dn_period( dn_tmp + 2, (JULIAN_DAY *) &ptime->data[5], &i);
+		}
+		char str_r[15];
+		sprintf(str_r,"R%d",rvalue);
+		strcat(str_out,str_r);
+		strncat(str_out,&period_sep,1);
 	}
 	else {
 		for( i = 0; i < *int_count; i++ ){
@@ -72,6 +119,18 @@ void ptime_to_string_calendar( POSTTIME * ptime , char * str_out , int32 * int_c
 			strncat(str_out,&period_sep,1);
 			date_numbers_to_instant_string( dn_tmp + i + 1 , str_out );
 		}
+		break;
+	case 5:
+		date_numbers_to_instant_string( dn_tmp , str_out );
+		strncat(str_out,&period_sep,1);
+		dn_duration_to_string( dn_tmp+1 , str_out );
+		break;
+	case 6:
+		date_numbers_to_instant_string( dn_tmp , str_out );
+		strncat(str_out,&period_sep,1);
+		dn_duration_to_string( dn_tmp+1 , str_out );
+		strncat(str_out,&period_sep,1);
+		dn_duration_to_string( dn_tmp+2 , str_out );
 		break;
 	}
 	FREE_MEM(dn_tmp);
@@ -122,7 +181,6 @@ void ptime_to_string_tcs( POSTTIME * ptime , char * str_out , int32 * int_count 
 	}
 	FREE_MEM(float_values);
 }
-
 
 void ptime_to_string_ordinal( POSTTIME * ptime , char * str_out , int32 * int_count ){
 	// TODO convert all JULIAN_DAYS in float8s

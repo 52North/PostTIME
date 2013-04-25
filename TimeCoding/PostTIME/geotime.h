@@ -17,6 +17,7 @@
 /* Syntax defining macros */
 #define PRIMITIVE_SEPARATOR ','
 #define PERIOD_SEPARATOR '/'
+#define REGULAR_SEPARATOR '/'
 
 /* Refsys-tags */
 #define CALENDAR_FLAG "CAL"
@@ -52,10 +53,8 @@ typedef struct {
         BYTE type;       /*!< Explicit store the type:
 ** INSTANT=1, PERIOD=2, MULTIINSTANT=3, MULTIPERIOD=4, terminating REGULARMULTIINSTANT 5,
 ** terminating REGULARMULTIPERIOD 6, REGULARMULTIINSTANT 7, REGULARMULTIPERIOD 8 */
-        float8 granularity; /*!< Every(!) instance has it's own granularity.
-        The granularity is stored as the factor relative to Milliseconds. */
         JULIAN_DAY data[1];  /*!< This object's instants. Stored as JULIAN_DAY. */
-} POSTTIME;     /* alias GEOTIME */
+} POSTTIME;
 
 /*!Enumeration to handle instances with different granularity. */
 typedef enum calendar_gran { YEAR, MONTH, DAY, HOUR, MINUTE, SECOND } calendar_gran;

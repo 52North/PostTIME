@@ -6,3 +6,4 @@ latex
 .project
 .cproject
 *.o
+PostTIME.doxyfile

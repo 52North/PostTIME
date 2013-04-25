@@ -93,7 +93,6 @@ pt_error_type parse_single_instant_string(char * str_in, DATE_NUMBERS * dn_ret){
 	int32 * p_int_dn_year = (int32 *) &(dn_ret->yea);
 	char * buf = str_in;
 	dn_ret->granularity = YEAR;
-
 	// Scan in and check.
 	while( i < 5 ){
     	buf = strchr( str_arr[i], char_delimiter[i] );
@@ -123,7 +122,6 @@ pt_error_type parse_single_instant_string(char * str_in, DATE_NUMBERS * dn_ret){
 		}
 	}
 
-	// Read in numbers. TODO has to throw error.
 	i++;
 	if( ret_err == NO_ERROR ){
 		for(j = 0; j < i ; j++){
@@ -133,13 +131,75 @@ pt_error_type parse_single_instant_string(char * str_in, DATE_NUMBERS * dn_ret){
 			}
 		}
 	}
-	// TODO this should be a temporally solution.
 	if( dn_ret->granularity < DAY ){
 		dn_ret->day = 1;
 		if( dn_ret->granularity < MONTH ) dn_ret->mon = 1;
 	}
 
 	return ret_err;
+}
+
+pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
+	pt_error_type err_ret = NO_ERROR;
+	const char calendar_value_identifier[] = {'Y','M','D'};
+	const char clock_value_identifier[] = {'H','M','S'};
+	char * clock_part = strchr(str_in,'T');
+	char * dur_str = str_in+1;
+	char * day_part_boundary;
+	if(clock_part == NULL) day_part_boundary = str_in + strlen(str_in);
+	else day_part_boundary = clock_part;
+	int32 err_byte = 1, i = 0;
+	/* search for calendar tags Y or_and M or_and D */
+	while((clock_part != dur_str) && (i<3) && err_byte == 1){
+		char * tmp = strchr(dur_str ,calendar_value_identifier[i]);
+		if(tmp != NULL && day_part_boundary > tmp){
+			*tmp = '\0';
+			switch(i){
+			case 0:
+				err_byte = parse_single_number(dur_str, &dn->yea);
+				break;
+			case 1:
+				err_byte = parse_single_number(dur_str, &dn->mon);
+				break;
+			case 2:
+				err_byte = parse_single_number(dur_str, &dn->day);
+				break;
+			}
+			dur_str = tmp+1;
+		}
+		i = i+1;
+	}
+	i = 0;
+	/* search for clock tags H, M and S */
+	if(clock_part != NULL && err_byte == 1){
+		dur_str = clock_part +1;
+		for(i = 0;i<3;i=i+1){
+			char * tmp = strchr(dur_str,clock_value_identifier[i]);
+			if(tmp != NULL){
+				*tmp = '\0';
+				switch(i){
+				case 0:
+					err_byte = parse_single_number(dur_str, &dn->hou);
+					break;
+				case 1:
+					err_byte = parse_single_number(dur_str, &dn->min);
+					break;
+				case 2:
+					err_byte = parse_single_float(dur_str, &dn->sec);
+					break;
+				}
+				dur_str = tmp+1;
+				if(err_byte != 1) break;
+			}
+		}
+		i = 0;
+	}
+	if(err_byte != 1){
+		err_ret = INVALID_SYNTAX_AT_OR_NEAR_REGULAR_VALUE;
+	}
+	clock_part = NULL;
+	dur_str = NULL;
+	return err_ret;
 }
 
 /*!Convert single-instant-strings in JULIAN_DAY-values.
@@ -268,3 +328,95 @@ pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptim
 	if( *int_count > 1 ) ptime_tmp->type = ptime_tmp->type + 2;
 	return ret_err;
 }
+
+void dn_period_to_jday_pack(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , int32 rvalue){
+	int32 int32_array[6] = { rvalue,
+			period_vals->yea,
+			period_vals->mon,
+			period_vals->day,
+			period_vals->hou,
+			period_vals->min };
+	memcpy( jd_ptr , int32_array , sizeof(JULIAN_DAY) * 3 );
+	*(jd_ptr + 3) = (int64) (period_vals->sec * MILLIS);
+}
+
+void jday_pack_to_dn_period(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , int32 * rvalue){
+	int32 int32_array[6] = { 0,0,0,0,0,0 };
+	memcpy( int32_array , jd_ptr , sizeof(JULIAN_DAY) * 3 );
+	int32 * debug_ptr = (int32 *) jd_ptr;
+	period_vals->sec = ((float8) *(jd_ptr + 3)) / ((float8) MILLIS);
+	*rvalue = int32_array[0];
+	period_vals->yea = int32_array[1];
+	period_vals->mon = int32_array[2];
+	period_vals->day = int32_array[3];
+	period_vals->hou = int32_array[4];
+	period_vals->min = int32_array[5];
+}
+
+// TODO implement for TCS! ..use switch - cases..
+pt_error_type regular_strings_to_ptime_instance(POSTTIME * ptime_tmp, char ** str_primitives, char * * str_reg_parts){
+	pt_error_type err_ret = NO_ERROR;
+	int32 int_r_value;
+	calendar_era * cal_system;
+	coordinate_system * tcs_system;
+	DATE_NUMBERS * dn_start;
+	DATE_NUMBERS * dn_period_valid;
+	DATE_NUMBERS * dn_period_invalid;
+	float8 float_instant = 0, float_period_valid = 0, float_period_invalid = 0;
+	if( parse_single_number( str_reg_parts[0] + 1, &int_r_value ) != 1){
+		err_ret = INVALID_SYNTAX_AT_OR_NEAR_REGULAR_VALUE;
+	}
+	else {
+		switch(ptime_tmp->refsys.type){
+		case 1:
+			dn_start = palloc(sizeof(DATE_NUMBERS));
+			memset(dn_start , 0 , sizeof(DATE_NUMBERS));
+			dn_period_valid = palloc(sizeof(DATE_NUMBERS));
+			memset(dn_period_valid , 0 , sizeof(DATE_NUMBERS));
+			dn_period_invalid = palloc(sizeof(DATE_NUMBERS));
+			memset(dn_period_invalid , 0 , sizeof(DATE_NUMBERS));
+
+			// str_reg_parts contains [0]=str_r_number, [1]str_p_valid, [2] str_p_invalid
+			if(err_ret == NO_ERROR) err_ret = parse_single_instant_string( str_primitives[0] , dn_start);
+			if( err_ret == NO_ERROR ){
+				cal_system = get_system_from_key( ptime_tmp->refsys.instance );
+				if( cal_system == NULL ) {
+					err_ret = CALENDAR_SYSTEM_NOT_FOUND;
+				}
+			}
+			if(err_ret == NO_ERROR) {
+				ptime_tmp->data[0] = cal_system->dnumber_to_jday( dn_start );
+				switch(ptime_tmp->type){
+				case 5:
+					err_ret = parse_single_duration_string( str_reg_parts[1] , dn_period_invalid );
+					dn_period_to_jday_pack( dn_period_invalid , &ptime_tmp->data[1] , int_r_value);
+					break;
+				case 6:
+					err_ret = parse_single_duration_string( str_reg_parts[1] , dn_period_valid );
+					dn_period_to_jday_pack( dn_period_valid , &ptime_tmp->data[1] , int_r_value);
+					if(err_ret == NO_ERROR) err_ret = parse_single_duration_string( str_reg_parts[2] , dn_period_invalid );
+					dn_period_to_jday_pack( dn_period_invalid , &ptime_tmp->data[5] , 0);
+					break;
+				}
+			}
+			FREE_MEM(dn_period_valid);
+			FREE_MEM(dn_period_invalid);
+			FREE_MEM(dn_start);
+			break;
+		case 2:
+			tcs_system = get_tcs_system_from_key( ptime_tmp->refsys.instance );
+			if( tcs_system == NULL ){
+				return TCS_SYSTEM_NOT_FOUND;
+			}
+			if( !parse_single_float( str_primitives[0] , &float_instant) ){
+				return CAN_NOT_PARSE_TCS_VALUE;
+			}
+			else {
+				ptime_tmp->data[1] = tcs_to_jday( &float_instant , tcs_system );
+				}
+			break;
+		}
+	}
+	return NO_ERROR;
+}
+

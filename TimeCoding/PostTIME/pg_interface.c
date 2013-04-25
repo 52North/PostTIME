@@ -28,9 +28,12 @@ posttime_in(PG_FUNCTION_ARGS){
 	// Determine count of (potential) primitives.
 	int32 int_count = 0;
 	int_count = count_of_primitives(str_in);
+	size_t size_max_needed = 0;
+	if(int_count == 1) size_max_needed = size_ptime + (size_jul * 8);
+	else size_max_needed = size_ptime + (size_jul * ( (2 * int_count)-1 ));
 	// Allocate memory for the new instance.
-	POSTTIME * ptime_tmp = palloc(size_ptime + (size_jul * ( (2 * int_count)-1 )) );
-	memset(ptime_tmp,'\0', size_ptime + (size_jul * ( (2 * int_count)-1 ))  );
+	POSTTIME * ptime_tmp = palloc(size_max_needed);
+	memset(ptime_tmp,'\0', size_max_needed );
 
 	pt_error_type ret_err = string_to_ptime(str_in, &int_count, ptime_tmp);
 
@@ -43,7 +46,8 @@ posttime_in(PG_FUNCTION_ARGS){
 
 	// Set count to finally needed count of data elements.
 	if ( (ptime_tmp->type % 2) == 0 ) int_count = int_count * 2;
-
+	if ( ptime_tmp->type == 5) int_count = 5;
+	else if ( ptime_tmp->type == 6) int_count = 9;
 	size_t size_fin = size_ptime + (size_jul * ( int_count-1 ));
 
 	POSTTIME * ptime_fin = palloc( size_fin );

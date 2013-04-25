@@ -8,6 +8,7 @@
 #include "calendars.h"
 #include "coordinate_system.h"
 #include "ordinal.h"
+#include "blackbox_converter.h"
 
 #ifndef TEXTUALIZATOR_H_
 #define TEXTUALIZATOR_H_

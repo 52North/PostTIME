@@ -24,6 +24,8 @@ typedef enum pt_error_type {
 	SPECIFY_ONLY_THE_NEW_SYSTEM,
 	ORD_SYSTEM_NOT_FOUND,
 	ORD_ERA_UNKNOWN,
+	EXPECTED_REGULAR_STR_IS_NOT_REGULAR,
+	INVALID_SYNTAX_AT_OR_NEAR_REGULAR_VALUE,
 } pt_error_type;
 
 typedef struct pt_error_msg {
