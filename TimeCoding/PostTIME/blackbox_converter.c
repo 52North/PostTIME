@@ -343,7 +343,6 @@ void dn_period_to_jday_pack(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , i
 void jday_pack_to_dn_period(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , int32 * rvalue){
 	int32 int32_array[6] = { 0,0,0,0,0,0 };
 	memcpy( int32_array , jd_ptr , sizeof(JULIAN_DAY) * 3 );
-	int32 * debug_ptr = (int32 *) jd_ptr;
 	period_vals->sec = ((float8) *(jd_ptr + 3)) / ((float8) MILLIS);
 	*rvalue = int32_array[0];
 	period_vals->yea = int32_array[1];
@@ -395,7 +394,8 @@ pt_error_type regular_strings_to_ptime_instance(POSTTIME * ptime_tmp, char ** st
 					err_ret = parse_single_duration_string( str_reg_parts[1] , dn_period_valid );
 					dn_period_to_jday_pack( dn_period_valid , &ptime_tmp->data[1] , int_r_value);
 					if(err_ret == NO_ERROR) err_ret = parse_single_duration_string( str_reg_parts[2] , dn_period_invalid );
-					dn_period_to_jday_pack( dn_period_invalid , &ptime_tmp->data[5] , 0);
+					memset( &int_r_value , 0 , sizeof(int32) );
+					dn_period_to_jday_pack( dn_period_invalid , &ptime_tmp->data[5] , int_r_value);
 					break;
 				}
 			}

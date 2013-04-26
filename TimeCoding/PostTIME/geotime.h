@@ -59,4 +59,6 @@ typedef struct {
 /*!Enumeration to handle instances with different granularity. */
 typedef enum calendar_gran { YEAR, MONTH, DAY, HOUR, MINUTE, SECOND } calendar_gran;
 
+void regular_multi_to_multi( POSTTIME * ptime_reg , POSTTIME * ptime_multi );
+
 #endif /* GEOTIME_H_ */
