@@ -48,9 +48,127 @@ BYTE dn_compare_dn(const DATE_NUMBERS * dn_one, const DATE_NUMBERS * dn_two) {
 			byte_ret = 1;
 		}
 	}
-
 	return byte_ret;
 }
+
+/*!This function adds a period to a calendar date - the result is determined according to the rules of
+ * the given calendar_era.
+ * @param[in] dn_in Given calendar date.
+ * @param[in] dn_add The period - also as DATE_NUMBERS.
+ * @param[in] cal Process according to this system.
+ * \return The result as DATE_NUMBERS. */
+DATE_NUMBERS dn_plus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_add, calendar_era * cal){
+	DATE_NUMBERS ret_dn;
+	BYTE is_leap;
+	memset(&ret_dn, '\0', sizeof(DATE_NUMBERS));
+	ret_dn.sec = dn_in->sec + dn_add->sec;
+	while(ret_dn.sec > 59){
+		ret_dn.sec = ret_dn.sec - 60;
+		dn_add->min++;
+	}
+	ret_dn.min = dn_in->min + dn_add->min;
+	while(ret_dn.min > 59){
+		ret_dn.min = ret_dn.min - 60;
+		dn_add->hou++;
+	}
+	ret_dn.hou = dn_in->hou + dn_add->hou;
+	while(ret_dn.hou > 23){
+		ret_dn.hou = ret_dn.hou - 24;
+		dn_add->day++;
+	}
+	int32 yea_tmp, mon_tmp, max_day, max_month;
+	ret_dn.day = dn_in->day + dn_add->day;
+	ret_dn.mon = dn_in->mon + dn_add->mon;
+	ret_dn.yea = dn_in->yea + dn_add->yea;
+
+	do {
+		yea_tmp = ret_dn.yea;
+		mon_tmp = ret_dn.mon;
+		is_leap = cal->is_leap_fct(ret_dn.yea);
+		if(is_leap){
+			max_month = cal->month_per_year_leap;
+		}
+		else {
+			max_month = cal->month_per_year;
+		}
+		while(ret_dn.mon > max_month){
+			ret_dn.mon = ret_dn.mon - max_month;
+			ret_dn.yea++;
+		}
+		if(ret_dn.mon == mon_tmp){
+			if(is_leap){
+				max_day = cal->days_per_month_leap[mon_tmp - 1];
+			}
+			else {
+				max_day = cal->days_per_month[mon_tmp - 1];
+			}
+			if( ret_dn.day > max_day ){
+				ret_dn.day = ret_dn.day - max_day;
+				ret_dn.mon++;
+			}
+		}
+	} while( ret_dn.mon != mon_tmp || ret_dn.yea != yea_tmp );
+	return ret_dn;
+}
+
+/*!This function subtracts a period from a calendar date - the result is determined according to the rules of
+ * the given calendar_era.
+ * @param[in] dn_in Given calendar date.
+ * @param[in] dn_minus The period - also as DATE_NUMBERS.
+ * @param[in] cal Process according to this system.
+ * \return The result as DATE_NUMBERS. */
+DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar_era * cal){
+	DATE_NUMBERS ret_dn;
+	BYTE is_leap;
+	memset(&ret_dn, '\0', sizeof(DATE_NUMBERS));
+	ret_dn.sec = dn_in->sec - dn_minus->sec;
+	while(ret_dn.sec < 0){
+		ret_dn.sec = ret_dn.sec + 60;
+		dn_minus->min++;
+	}
+	ret_dn.min = dn_in->min - dn_minus->min;
+	while(ret_dn.min < 0){
+		ret_dn.min = ret_dn.min + 60;
+		dn_minus->hou++;
+	}
+	ret_dn.hou = dn_in->hou - dn_minus->hou;
+	while(ret_dn.hou < 0){
+		ret_dn.hou = ret_dn.hou + 24;
+		dn_minus->day++;
+	}
+	int32 yea_tmp, mon_tmp, max_day, max_month;
+	ret_dn.day = dn_in->day - dn_minus->day;
+	ret_dn.mon = dn_in->mon - dn_minus->mon;
+	ret_dn.yea = dn_in->yea - dn_minus->yea;
+
+	do {
+		yea_tmp = ret_dn.yea;
+		mon_tmp = ret_dn.mon;
+		is_leap = cal->is_leap_fct(ret_dn.yea);
+		while(ret_dn.mon < 1){
+			ret_dn.yea--;
+			if(is_leap){
+				max_month = cal->month_per_year_leap;
+			}
+			else {
+				max_month = cal->month_per_year;
+			}
+			ret_dn.mon = ret_dn.mon + max_month;
+		}
+		if(ret_dn.mon == mon_tmp && ret_dn.day < 1){
+			ret_dn.mon--;
+			if(is_leap){
+				max_day = cal->days_per_month_leap[ret_dn.mon - 1];
+			}
+			else {
+				max_day = cal->days_per_month[ret_dn.mon - 1];
+			}
+			ret_dn.day = ret_dn.day + max_day;
+		}
+	} while( ret_dn.mon != mon_tmp || ret_dn.yea != yea_tmp );
+	return ret_dn;
+}
+
 
 /************************************************************************************
 		U T		C L O C K 		S Y S T E M
@@ -87,15 +205,12 @@ BYTE check_validity(const DATE_NUMBERS * dn_in, const calendar_era * refsys){
 	if( dn_compare_dn(dn_in, refsys->lower_boundary) == -1 ) return byte_ret;
 	if( dn_compare_dn(dn_in, refsys->upper_boundary) == 1 ) return byte_ret;
 
-	printf("\nTest mark 1 says: %d", is_leap);
-
 	// Check month and day.
 	if( is_leap ) {
 		if( !check_value( 1, refsys->month_per_year_leap, dn_in->mon ) ) return byte_ret;
 		if( !check_value( 1, *(&refsys->days_per_month_leap[0]+dn_in->mon-1), dn_in->day) ) return byte_ret;
 	}
 	else {
-		printf("\nTest mark 3 says: %d", *( (&refsys->days_per_month[0]) +dn_in->mon-1));
 		if( !check_value( 1, refsys->month_per_year, dn_in->mon ) ) return byte_ret;
 		if( !check_value( 1, *( (&refsys->days_per_month[0]) +dn_in->mon-1), dn_in->day) ) return byte_ret;
 	}

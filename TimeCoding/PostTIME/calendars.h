@@ -49,15 +49,10 @@ typedef struct calendar_system {
 	calendar_era * calendar_era;
 } calendar_system;
 
-// extern const calendar_era gregorian;
-
 extern const calendar_system calendar_systems[];
 
-// bool date_numbers_to_ptime( POSTTIME * ptime_tmp, DATE_NUMBERS * dn, int32 * int_count );
-// TODO
-BYTE dn_plus_dn(DATE_NUMBERS * dn_in_out, DATE_NUMBERS * dn_add, calendar_era * cal);
-// TODO
-BYTE dn_minus_dn(DATE_NUMBERS * dn_in_out, DATE_NUMBERS * dn_minus, calendar_era * cal);
+DATE_NUMBERS dn_plus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_add, calendar_era * cal);
+DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar_era * cal);
 BYTE dn_compare_dn(const DATE_NUMBERS * dn_one, const DATE_NUMBERS * dn_two);
 
 calendar_era * get_system_from_key( int32 key );
