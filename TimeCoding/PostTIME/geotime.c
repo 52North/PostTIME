@@ -73,5 +73,25 @@ void regular_multi_to_multi( POSTTIME * ptime_reg , POSTTIME * ptime_multi ){
 		}
 		break;
 	}
+}
 
+pt_error_type get_rvalue(POSTTIME * ptime_reg, int32 * rvalue){
+	pt_error_type ret_err = NO_ERROR;
+	if(ptime_reg->type < 5){
+		ret_err = REGULAR_MULTI_FUNCTION;
+	}
+	else {
+		switch( ptime_reg->refsys.type ){
+		case 1:
+			*rvalue = (int32) ptime_reg->data[1];
+			break;
+		case 2:
+			*rvalue = (int32) ptime_reg->data[0];
+			break;
+		case 3:
+			ret_err = FUNCTION_UNDEFINED_FOR_ORDINAL;
+			break;
+		}
+	}
+	return ret_err;
 }

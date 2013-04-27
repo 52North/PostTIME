@@ -9,7 +9,8 @@
 // Function Declaration
 Datum posttime_in(PG_FUNCTION_ARGS);
 Datum posttime_out(PG_FUNCTION_ARGS);
-Datum transform_system(PG_FUNCTION_ARGS);
+Datum pt_transform_system(PG_FUNCTION_ARGS);
+Datum pt_regular_multi_to_multi(PG_FUNCTION_ARGS);
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
@@ -85,9 +86,9 @@ posttime_out(PG_FUNCTION_ARGS){
     PG_RETURN_CSTRING(str_out);
 }
 
-PG_FUNCTION_INFO_V1(transform_system);
+PG_FUNCTION_INFO_V1(pt_transform_system);
 Datum
-transform_system(PG_FUNCTION_ARGS){
+pt_transform_system(PG_FUNCTION_ARGS){
 	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
 	char * str_in = PG_GETARG_CSTRING(1);
 	char * char_tmp = "P";
@@ -96,7 +97,9 @@ transform_system(PG_FUNCTION_ARGS){
 	memset( ptime_ret, 0 ,VARSIZE(ptime) );
 
 	pt_error_type err = determine_refsys( str_in , dummy , ptime_ret );
+	if( ptime->refsys.type == 3 ) err = FUNCTION_UNDEFINED_FOR_ORDINAL;
 	if(*(dummy[0]) != 0 && err == NO_ERROR) err = SPECIFY_ONLY_THE_NEW_SYSTEM;
+
 	if( err != NO_ERROR ){
 		FREE_MEM(ptime_ret);
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
@@ -108,6 +111,28 @@ transform_system(PG_FUNCTION_ARGS){
 			VARSIZE(ptime) - VARHDRSZ -sizeof(REFSYS) );
 	SET_VARSIZE( ptime_ret, VARSIZE(ptime) );
 
+	PG_RETURN_POINTER(ptime_ret);
+}
+
+PG_FUNCTION_INFO_V1(pt_regular_multi_to_multi);
+Datum
+pt_regular_multi_to_multi(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+	int32 rvalue = 0;
+	POSTTIME * ptime_ret;
+	pt_error_type ret_err = get_rvalue( ptime , &rvalue );
+	if( ret_err == NO_ERROR ){
+		size_t size_needed = sizeof(POSTTIME) + ( sizeof(JULIAN_DAY) * (( rvalue + 1 ) * ( ptime->type - 4 ) - 1));
+		ptime_ret = palloc( size_needed );
+		memset(ptime_ret,'\0', size_needed );
+		regular_multi_to_multi( ptime, ptime_ret );
+		SET_VARSIZE( ptime_ret, size_needed );
+	}
+	else {
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
 	PG_RETURN_POINTER(ptime_ret);
 }
 

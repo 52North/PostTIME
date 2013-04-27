@@ -60,5 +60,6 @@ typedef struct {
 typedef enum calendar_gran { YEAR, MONTH, DAY, HOUR, MINUTE, SECOND } calendar_gran;
 
 void regular_multi_to_multi( POSTTIME * ptime_reg , POSTTIME * ptime_multi );
+pt_error_type get_rvalue(POSTTIME * ptime_reg, int32 * rvalue);
 
 #endif /* GEOTIME_H_ */

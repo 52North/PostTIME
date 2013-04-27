@@ -196,38 +196,38 @@ const clock_system clock_ut = {
  * calendar_era.
  * @param[in] dn_in The DATE_NUMBERS.
  * @param[in] refsys Ensure semantical correctness relative to this system.
- * \return 1=Values are ok, 0=Not a valid date. */
-BYTE check_validity(const DATE_NUMBERS * dn_in, const calendar_era * refsys){
-	BYTE byte_ret = 0;
+ * \return pt_error_type. */
+pt_error_type check_validity(const DATE_NUMBERS * dn_in, const calendar_era * refsys){
+	pt_error_type err_ret = CALENDAR_VALUES_NOT_VALID;
 	BYTE is_leap = refsys->is_leap_fct(dn_in->yea);
 	BYTE is_leap_sec = refsys->clock_system->is_leap_fct(dn_in);
 	// Check years and general extent.
-	if( dn_compare_dn(dn_in, refsys->lower_boundary) == -1 ) return byte_ret;
-	if( dn_compare_dn(dn_in, refsys->upper_boundary) == 1 ) return byte_ret;
+	if( dn_compare_dn(dn_in, refsys->lower_boundary) == -1 ) return err_ret;
+	if( dn_compare_dn(dn_in, refsys->upper_boundary) == 1 ) return err_ret;
 
 	// Check month and day.
 	if( is_leap ) {
-		if( !check_value( 1, refsys->month_per_year_leap, dn_in->mon ) ) return byte_ret;
-		if( !check_value( 1, *(&refsys->days_per_month_leap[0]+dn_in->mon-1), dn_in->day) ) return byte_ret;
+		if( !check_value( 1, refsys->month_per_year_leap, dn_in->mon ) ) return err_ret;
+		if( !check_value( 1, *(&refsys->days_per_month_leap[0]+dn_in->mon-1), dn_in->day) ) return err_ret;
 	}
 	else {
-		if( !check_value( 1, refsys->month_per_year, dn_in->mon ) ) return byte_ret;
-		if( !check_value( 1, *( (&refsys->days_per_month[0]) +dn_in->mon-1), dn_in->day) ) return byte_ret;
+		if( !check_value( 1, refsys->month_per_year, dn_in->mon ) ) return err_ret;
+		if( !check_value( 1, *( (&refsys->days_per_month[0]) +dn_in->mon-1), dn_in->day) ) return err_ret;
 	}
 	// Check clock.
 
-	if( !check_value( 0, refsys->clock_system->hours_per_day - 1, dn_in->hou ) ) return byte_ret;
-	if( !check_value( 0, refsys->clock_system->minutes_per_hour - 1, dn_in->min ) ) return byte_ret;
+	if( !check_value( 0, refsys->clock_system->hours_per_day - 1, dn_in->hou ) ) return err_ret;
+	if( !check_value( 0, refsys->clock_system->minutes_per_hour - 1, dn_in->min ) ) return err_ret;
 
 
 	if( is_leap_sec ){
-		if ((dn_in->sec  > ( refsys->clock_system->seconds_per_minute_leap - 1 ) )&&(dn_in->sec  < 0)) return byte_ret;
+		if ((dn_in->sec  > ( refsys->clock_system->seconds_per_minute_leap - 1 ) )&&(dn_in->sec  < 0)) return err_ret;
 	}
 	else {
-		if ((dn_in->sec  > ( refsys->clock_system->seconds_per_minute - 1) )&&(dn_in->sec  < 0)) return byte_ret;
+		if ((dn_in->sec  > ( refsys->clock_system->seconds_per_minute - 1) )&&(dn_in->sec  < 0)) return err_ret;
 	}
-	byte_ret = 1;
-	return byte_ret;
+	err_ret = NO_ERROR;
+	return err_ret;
 
 }
 
@@ -320,7 +320,6 @@ static JULIAN_DAY dnumber_to_jday_greg( DATE_NUMBERS * dn ){
  * @param[in] jd The JULIAN_DAY value.
  * \return The transformed DATE_NUMBERS. */
 static DATE_NUMBERS jday_to_dnumbers_greg( JULIAN_DAY * jd ){
-	// TODO CALCULATE IN MILLIS
 	DATE_NUMBERS dn;
 	int32 J = (int32) ( (*jd + 43200000) / MILLIS);
 	// int32 J = (int32)(*jd+0.5);  /* jd without daytime */

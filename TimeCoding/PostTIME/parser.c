@@ -182,10 +182,11 @@ pt_error_type string_to_ptime(char * str_in, int32 * int_count, POSTTIME * ptime
 		BYTE byte_instant_test = string_is_instant(str_primitives, str_primitives_end, &i);
 
 		if( !byte_instant_test ) {
-			// TODO : at this Point the strings in str_primitives could
+			// At this Point the strings in str_primitives could
 			// contain a regularMultiObject. Check for validity and parse.
 			// could only be a tcs or calendarClock sys.
 			if(*int_count > 1) ret_err = PERIOD_CAN_ONLY_CONTAIN_SINGLE_SLASH;
+			else if(ptime_tmp->refsys.type == 3 ) ret_err = FUNCTION_UNDEFINED_FOR_ORDINAL;
 			else {
 				// str_reg_parts contains [0]=str_r_number, [1]str_p_valid, [2] str_p_invalid
 				char * * str_reg_parts = palloc(sizeof(char *) * 3 );
@@ -193,7 +194,7 @@ pt_error_type string_to_ptime(char * str_in, int32 * int_count, POSTTIME * ptime
 				ret_err = string_is_regular(ptime_tmp, str_primitives, str_reg_parts);
 
 				if(ret_err == NO_ERROR) {
-					regular_strings_to_ptime_instance(ptime_tmp, str_primitives, str_reg_parts);
+					ret_err = regular_strings_to_ptime_instance(ptime_tmp, str_primitives, str_reg_parts);
 				}
 				FREE_MEM(str_reg_parts);
 			}

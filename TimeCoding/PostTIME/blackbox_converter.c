@@ -146,12 +146,15 @@ pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
 	char * clock_part = strchr(str_in,'T');
 	char * dur_str = str_in+1;
 	char * day_part_boundary;
-	if(clock_part == NULL) day_part_boundary = str_in + strlen(str_in);
+	char * cntrl_str = NULL;
+	int32 int_strlen = strlen(str_in);
+	if(clock_part == NULL) day_part_boundary = str_in + int_strlen;
 	else day_part_boundary = clock_part;
 	int32 err_byte = 1, i = 0;
+	char * tmp = NULL;
 	/* search for calendar tags Y or_and M or_and D */
 	while((clock_part != dur_str) && (i<3) && err_byte == 1){
-		char * tmp = strchr(dur_str ,calendar_value_identifier[i]);
+		tmp = strchr(dur_str ,calendar_value_identifier[i]);
 		if(tmp != NULL && day_part_boundary > tmp){
 			*tmp = '\0';
 			switch(i){
@@ -166,6 +169,7 @@ pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
 				break;
 			}
 			dur_str = tmp+1;
+			cntrl_str = tmp+1;
 		}
 		i = i+1;
 	}
@@ -174,7 +178,7 @@ pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
 	if(clock_part != NULL && err_byte == 1){
 		dur_str = clock_part +1;
 		for(i = 0;i<3;i=i+1){
-			char * tmp = strchr(dur_str,clock_value_identifier[i]);
+			tmp = strchr(dur_str,clock_value_identifier[i]);
 			if(tmp != NULL){
 				*tmp = '\0';
 				switch(i){
@@ -189,12 +193,13 @@ pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
 					break;
 				}
 				dur_str = tmp+1;
+				cntrl_str = tmp+1;
 				if(err_byte != 1) break;
 			}
 		}
 		i = 0;
 	}
-	if(err_byte != 1){
+	if(err_byte != 1 || ( str_in + int_strlen != cntrl_str ) ){
 		err_ret = INVALID_SYNTAX_AT_OR_NEAR_REGULAR_VALUE;
 	}
 	clock_part = NULL;
@@ -206,7 +211,7 @@ pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
  * @param[in] int_count Count of primitives.
  * @param[in] str_primitives The separated instant-strings.
  * @param[in] str_primitives_end In case of period this holds the end-instants.
- * @param[in/out] ptime_tmp Input are the REFSYS-values and type. If the function is successful finished the data[] is filled. */
+ * @param[inout] ptime_tmp Input are the REFSYS-values and type. If the function is successful finished the data[] is filled. */
 pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptime_tmp, char **str_primitives, char **str_primitives_end){
 	int32 position_end = 0, position = 0, i = 0;
 	pt_error_type ret_err = NO_ERROR;
@@ -257,7 +262,9 @@ pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptim
 			else {
 				int32 int_count_instants = *int_count * ptime_tmp->type;
 				for( i = 0; i < int_count_instants; i++ ){
+					ret_err = check_validity( dn_tmp + i , cal_system );
 					ptime_tmp->data[i] = cal_system->dnumber_to_jday( dn_tmp + i );
+					if( ret_err != NO_ERROR ) break;
 				}
 			}
 		}
@@ -352,7 +359,7 @@ void jday_pack_to_dn_period(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , i
 	period_vals->min = int32_array[5];
 }
 
-// TODO implement for TCS! ..use switch - cases..
+// TODO comment
 pt_error_type regular_strings_to_ptime_instance(POSTTIME * ptime_tmp, char ** str_primitives, char * * str_reg_parts){
 	pt_error_type err_ret = NO_ERROR;
 	int32 int_r_value;
@@ -384,19 +391,22 @@ pt_error_type regular_strings_to_ptime_instance(POSTTIME * ptime_tmp, char ** st
 				}
 			}
 			if(err_ret == NO_ERROR) {
+				err_ret = check_validity( dn_start , cal_system );
+				if(err_ret == NO_ERROR) {
 				ptime_tmp->data[0] = cal_system->dnumber_to_jday( dn_start );
-				switch(ptime_tmp->type){
-				case 5:
-					err_ret = parse_single_duration_string( str_reg_parts[1] , dn_period_invalid );
-					dn_period_to_jday_pack( dn_period_invalid , &ptime_tmp->data[1] , int_r_value);
-					break;
-				case 6:
-					err_ret = parse_single_duration_string( str_reg_parts[1] , dn_period_valid );
-					dn_period_to_jday_pack( dn_period_valid , &ptime_tmp->data[1] , int_r_value);
-					if(err_ret == NO_ERROR) err_ret = parse_single_duration_string( str_reg_parts[2] , dn_period_invalid );
-					memset( &int_r_value , 0 , sizeof(int32) );
-					dn_period_to_jday_pack( dn_period_invalid , &ptime_tmp->data[5] , int_r_value);
-					break;
+					switch(ptime_tmp->type){
+					case 5:
+						err_ret = parse_single_duration_string( str_reg_parts[1] , dn_period_invalid );
+						dn_period_to_jday_pack( dn_period_invalid , &ptime_tmp->data[1] , int_r_value);
+						break;
+					case 6:
+						err_ret = parse_single_duration_string( str_reg_parts[1] , dn_period_valid );
+						dn_period_to_jday_pack( dn_period_valid , &ptime_tmp->data[1] , int_r_value);
+						if(err_ret == NO_ERROR) err_ret = parse_single_duration_string( str_reg_parts[2] , dn_period_invalid );
+						memset( &int_r_value , 0 , sizeof(int32) );
+						dn_period_to_jday_pack( dn_period_invalid , &ptime_tmp->data[5] , int_r_value);
+						break;
+					}
 				}
 			}
 			FREE_MEM(dn_period_valid);
@@ -425,6 +435,6 @@ pt_error_type regular_strings_to_ptime_instance(POSTTIME * ptime_tmp, char ** st
 			break;
 		}
 	}
-	return NO_ERROR;
+	return err_ret;
 }
 

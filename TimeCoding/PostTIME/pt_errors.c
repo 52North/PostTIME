@@ -34,6 +34,12 @@ const pt_error_msg pt_error_msgs[] = {
 		{ EXPECTED_REGULAR_STR_IS_NOT_REGULAR ,
 		"Assumed that the given string represents a RegularMultiObject, but is not valid in this way."},
 		{ INVALID_SYNTAX_AT_OR_NEAR_REGULAR_VALUE ,
-		"An error occurred during parsing the single regular values"	},
+		"An error occurred during parsing a single regular value"	},
+		{ REGULAR_MULTI_FUNCTION ,
+		"This function is only defined for RegularMultiObjects."},
+		{FUNCTION_UNDEFINED_FOR_ORDINAL ,
+		"This function does not work with Ordinal Systems"},
+		{CALENDAR_VALUES_NOT_VALID ,
+		"This values are not representing an valid datum in this calendar"},
 };
 

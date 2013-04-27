@@ -54,7 +54,14 @@ CREATE TYPE posttime (
 -- BASIC DATA PROCESSING FUNCTIONALITY
 -------------------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION transform_system(posttime, cstring)
+CREATE OR REPLACE FUNCTION pt_transform_system(posttime, cstring)
 	RETURNS posttime
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
+
+
+CREATE OR REPLACE FUNCTION pt_regular_multi_to_multi(posttime)
+        RETURNS posttime
+        AS '$libdir/posttime'
+        LANGUAGE 'c' IMMUTABLE STRICT;
+

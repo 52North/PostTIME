@@ -54,7 +54,7 @@ extern const calendar_system calendar_systems[];
 DATE_NUMBERS dn_plus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_add, calendar_era * cal);
 DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar_era * cal);
 BYTE dn_compare_dn(const DATE_NUMBERS * dn_one, const DATE_NUMBERS * dn_two);
-
+pt_error_type check_validity(const DATE_NUMBERS * dn_in, const calendar_era * refsys);
 calendar_era * get_system_from_key( int32 key );
 
 #endif /* DATE_NUMBERS_TO_JUL_DAY_H_ */
