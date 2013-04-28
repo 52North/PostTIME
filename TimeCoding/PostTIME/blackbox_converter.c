@@ -6,6 +6,11 @@
 
 #include "blackbox_converter.h"
 
+DATE_NUMBERS dn_duration_year = { 0, 1, 0, 0, 0, 0, 0, 0, 0 };
+DATE_NUMBERS dn_duration_mon = { 0, 0, 1, 0, 0, 0, 0, 0, 0 };
+DATE_NUMBERS dn_duration_day = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
+DATE_NUMBERS dn_duration_msec = { 0.001, 0, 0, 0, 0, 0, 0, 0, 0 };
+
 /*!Parse in a single integer number and ensure syntactical validity, which means that the
  * string contains only numbers at this point.
  * @param[in] str_in The string.
@@ -207,6 +212,25 @@ pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
 	return err_ret;
 }
 
+void adjust_dn_to_granularity( DATE_NUMBERS * dn_in_out , calendar_era * cal ){
+	switch(dn_in_out->granularity){
+	case YEAR:
+		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_year , cal );
+		*dn_in_out = dn_minus_dn( dn_in_out , &dn_duration_msec , cal );
+		break;
+	case MONTH:
+		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_mon , cal );
+		*dn_in_out = dn_minus_dn( dn_in_out , &dn_duration_msec , cal );
+		break;
+	case DAY:
+		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_day , cal );
+		*dn_in_out = dn_minus_dn( dn_in_out , &dn_duration_msec , cal );
+		break;
+	default:
+		break;
+	}
+}
+
 /*!Convert single-instant-strings in JULIAN_DAY-values.
  * @param[in] int_count Count of primitives.
  * @param[in] str_primitives The separated instant-strings.
@@ -221,23 +245,53 @@ pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptim
 	calendar_era * cal_system;
 	coordinate_system * tcs_system;
 	ordinal_system * ord_system;
+	int32 int_count_instants = *int_count * ptime_tmp->type;
 	switch(ptime_tmp->refsys.type){
 	case 1:
 		// Allocate memory for DATE_NUMBERS
-		size_needed_dn = sizeof(DATE_NUMBERS) * (*int_count * ptime_tmp->type);
-		dn_tmp = (DATE_NUMBERS *) palloc(size_needed_dn);
+		size_needed_dn = sizeof(DATE_NUMBERS) * *int_count * 2;
+		dn_tmp = (DATE_NUMBERS *) malloc(size_needed_dn);
 		memset(dn_tmp, 0, size_needed_dn);
+		cal_system = get_system_from_key( ptime_tmp->refsys.instance );
+		BYTE short_form = 0;
+		if( cal_system == NULL ) {
+				ret_err = CALENDAR_SYSTEM_NOT_FOUND;
+		}
+		else {
 		// Extract numbers into the DATE_NUMBERS
 			if(ptime_tmp->type == 1){
+				ret_err = parse_single_instant_string( str_primitives[0], dn_tmp );
+				if( ret_err == NO_ERROR && dn_tmp->granularity < HOUR ) {
+				// short form period agreement.
+					memcpy( dn_tmp + 1 , dn_tmp , sizeof(DATE_NUMBERS) );
+					adjust_dn_to_granularity(dn_tmp + 1 , cal_system );
+					for( i = 1; i < *int_count; i++ ){
+						ret_err = parse_single_instant_string( str_primitives[i], dn_tmp + (i * 2) );
+						if( ret_err != NO_ERROR ) {
+							break;
+						}
+						if( (dn_tmp + (i * 2))->granularity > DAY ) {
+							ret_err = SHORT_FORM_AGREEMENT_CONFUSION;
+							break;
+						}
+						memcpy( dn_tmp + (i * 2) + 1 , dn_tmp + (i * 2) , sizeof(DATE_NUMBERS) );
+						adjust_dn_to_granularity(dn_tmp + (i * 2) + 1 , cal_system );
+					}
 
-				for( i = 0; i < *int_count; i++ ){
-					ret_err = parse_single_instant_string( str_primitives[i], dn_tmp + i );
-					if( ret_err != NO_ERROR ) {
-						break;
+					short_form = 1;
+					ptime_tmp->type = 2;
+					int_count_instants = *int_count * ptime_tmp->type;
+				}
+				if (ret_err == NO_ERROR && short_form == 0) {
+					for( i = 1; i < *int_count; i++ ){
+						ret_err = parse_single_instant_string( str_primitives[i], dn_tmp + i );
+						if( ret_err != NO_ERROR ) {
+							break;
+						}
 					}
 				}
 			}
-			else if(ptime_tmp->type == 2){
+			else if(ptime_tmp->type == 2 && short_form == 0){
 				pt_error_type tmp_err = NO_ERROR;
 				for( i = 0; i < *int_count; i++ ){
 					ret_err = parse_single_instant_string( str_primitives[i] , dn_tmp + (i * 2) );
@@ -251,16 +305,11 @@ pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptim
 						ret_err = PERIOD_START_BEFORE_END;
 						break;
 					}
+					adjust_dn_to_granularity(dn_tmp + i + 1 , cal_system );
 				}
 			}
-		if( ret_err == NO_ERROR ){
-			cal_system = get_system_from_key( ptime_tmp->refsys.instance );
+			if( ret_err == NO_ERROR ){
 
-			if( cal_system == NULL ) {
-				ret_err = CALENDAR_SYSTEM_NOT_FOUND;
-			}
-			else {
-				int32 int_count_instants = *int_count * ptime_tmp->type;
 				for( i = 0; i < int_count_instants; i++ ){
 					ret_err = check_validity( dn_tmp + i , cal_system );
 					ptime_tmp->data[i] = cal_system->dnumber_to_jday( dn_tmp + i );
@@ -268,7 +317,7 @@ pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptim
 				}
 			}
 		}
-		FREE_MEM(dn_tmp);
+		free(dn_tmp);
 		break;
 	case 2:
 		tcs_system = get_tcs_system_from_key( ptime_tmp->refsys.instance );

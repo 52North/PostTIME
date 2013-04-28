@@ -58,28 +58,29 @@ BYTE dn_compare_dn(const DATE_NUMBERS * dn_one, const DATE_NUMBERS * dn_two) {
  * @param[in] cal Process according to this system.
  * \return The result as DATE_NUMBERS. */
 DATE_NUMBERS dn_plus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_add, calendar_era * cal){
-	DATE_NUMBERS ret_dn;
+	DATE_NUMBERS ret_dn, dn_add_intern;
 	BYTE is_leap;
 	memset(&ret_dn, '\0', sizeof(DATE_NUMBERS));
-	ret_dn.sec = dn_in->sec + dn_add->sec;
+	memcpy(&dn_add_intern, dn_add, sizeof(DATE_NUMBERS));
+	ret_dn.sec = dn_in->sec + dn_add_intern.sec;
 	while(ret_dn.sec > 59){
 		ret_dn.sec = ret_dn.sec - 60;
-		dn_add->min++;
+		dn_add_intern.min++;
 	}
-	ret_dn.min = dn_in->min + dn_add->min;
+	ret_dn.min = dn_in->min + dn_add_intern.min;
 	while(ret_dn.min > 59){
 		ret_dn.min = ret_dn.min - 60;
-		dn_add->hou++;
+		dn_add_intern.hou++;
 	}
-	ret_dn.hou = dn_in->hou + dn_add->hou;
+	ret_dn.hou = dn_in->hou + dn_add_intern.hou;
 	while(ret_dn.hou > 23){
 		ret_dn.hou = ret_dn.hou - 24;
-		dn_add->day++;
+		dn_add_intern.day++;
 	}
 	int32 yea_tmp, mon_tmp, max_day, max_month;
-	ret_dn.day = dn_in->day + dn_add->day;
-	ret_dn.mon = dn_in->mon + dn_add->mon;
-	ret_dn.yea = dn_in->yea + dn_add->yea;
+	ret_dn.day = dn_in->day + dn_add_intern.day;
+	ret_dn.mon = dn_in->mon + dn_add_intern.mon;
+	ret_dn.yea = dn_in->yea + dn_add_intern.yea;
 
 	do {
 		yea_tmp = ret_dn.yea;
@@ -118,28 +119,29 @@ DATE_NUMBERS dn_plus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_add, calendar_er
  * @param[in] cal Process according to this system.
  * \return The result as DATE_NUMBERS. */
 DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar_era * cal){
-	DATE_NUMBERS ret_dn;
+	DATE_NUMBERS ret_dn, dn_minus_intern;
 	BYTE is_leap;
 	memset(&ret_dn, '\0', sizeof(DATE_NUMBERS));
-	ret_dn.sec = dn_in->sec - dn_minus->sec;
+	memcpy(&dn_minus_intern, dn_minus, sizeof(DATE_NUMBERS));
+	ret_dn.sec = dn_in->sec - dn_minus_intern.sec;
 	while(ret_dn.sec < 0){
 		ret_dn.sec = ret_dn.sec + 60;
-		dn_minus->min++;
+		dn_minus_intern.min++;
 	}
-	ret_dn.min = dn_in->min - dn_minus->min;
+	ret_dn.min = dn_in->min - dn_minus_intern.min;
 	while(ret_dn.min < 0){
 		ret_dn.min = ret_dn.min + 60;
-		dn_minus->hou++;
+		dn_minus_intern.hou++;
 	}
-	ret_dn.hou = dn_in->hou - dn_minus->hou;
+	ret_dn.hou = dn_in->hou - dn_minus_intern.hou;
 	while(ret_dn.hou < 0){
 		ret_dn.hou = ret_dn.hou + 24;
-		dn_minus->day++;
+		dn_minus_intern.day++;
 	}
 	int32 yea_tmp, mon_tmp, max_day, max_month;
-	ret_dn.day = dn_in->day - dn_minus->day;
-	ret_dn.mon = dn_in->mon - dn_minus->mon;
-	ret_dn.yea = dn_in->yea - dn_minus->yea;
+	ret_dn.day = dn_in->day - dn_minus_intern.day;
+	ret_dn.mon = dn_in->mon - dn_minus_intern.mon;
+	ret_dn.yea = dn_in->yea - dn_minus_intern.yea;
 
 	do {
 		yea_tmp = ret_dn.yea;
@@ -147,6 +149,7 @@ DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar
 		is_leap = cal->is_leap_fct(ret_dn.yea);
 		while(ret_dn.mon < 1){
 			ret_dn.yea--;
+			is_leap = cal->is_leap_fct(ret_dn.yea); // TODO
 			if(is_leap){
 				max_month = cal->month_per_year_leap;
 			}
@@ -155,8 +158,8 @@ DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar
 			}
 			ret_dn.mon = ret_dn.mon + max_month;
 		}
-		if(ret_dn.mon == mon_tmp && ret_dn.day < 1){
-			ret_dn.mon--;
+		if(ret_dn.day < 1){
+			if(ret_dn.mon == mon_tmp) ret_dn.mon--;
 			if(is_leap){
 				max_day = cal->days_per_month_leap[ret_dn.mon - 1];
 			}
@@ -168,7 +171,6 @@ DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar
 	} while( ret_dn.mon != mon_tmp || ret_dn.yea != yea_tmp );
 	return ret_dn;
 }
-
 
 /************************************************************************************
 		U T		C L O C K 		S Y S T E M

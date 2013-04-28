@@ -29,6 +29,7 @@ typedef enum pt_error_type {
 	REGULAR_MULTI_FUNCTION,
 	FUNCTION_UNDEFINED_FOR_ORDINAL,
 	CALENDAR_VALUES_NOT_VALID,
+	SHORT_FORM_AGREEMENT_CONFUSION,
 } pt_error_type;
 
 typedef struct pt_error_msg {

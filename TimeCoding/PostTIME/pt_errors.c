@@ -41,5 +41,7 @@ const pt_error_msg pt_error_msgs[] = {
 		"This function does not work with Ordinal Systems"},
 		{CALENDAR_VALUES_NOT_VALID ,
 		"This values are not representing an valid datum in this calendar"},
+		{SHORT_FORM_AGREEMENT_CONFUSION ,
+		"If you make use of the short form period agreement in a MultiInstant you have to use it for all containing single instants."},
 };
 
