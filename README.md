@@ -34,29 +34,29 @@ If you want to undo the installation just remove all files naming posttime from 
 Transforms a PostTIME instance into the reference system specified by the given key. *Examples:*
 
     // UNIX time to gregorian calendar.
-    SELECT pt_transform_system('TCS0021'::posttime, 'CAL001')
+    SELECT pt_transform_system('TCS0021', 'CAL001')
     //result
     'CAL001001970-01-01T00:00:01.000Z'
 
      // or calendar date to julian day
-    SELECT pt_transform_system('CAL0012013-4-30'::posttime, 'TCS001')
+    SELECT pt_transform_system('CAL0012013-4-30', 'TCS001')
     'TCS001002456412.500000'
 
 ##### pt\_regular\_multi_to\_multi( PostTIME ) : PostTIME 
 This function transform's an RegularMultiObject into a normal MultiObject, what means you get concrete instants. *Examples:*
 
-    SELECT pt_regular_multi_to_multi('R3/2012-1-1/P3M/P9M'::posttime);
+    SELECT pt_regular_multi_to_multi('R3/2012-1-1/P3M/P9M');
     //result:  
     'CAL001002012-01-01T00:00:00.000Z/002012-04-01T00:00:00.000Z,
     002013-01-01T00:00:00.000Z/002013-04-01T00:00:00.000Z,
     002014-01-01T00:00:00.000Z/002014-04-01T00:00:00.000Z,
     002015-01-01T00:00:00.000Z/002015-04-01T00:00:00.000Z'
 
-    SELECT pt_regular_multi_to_multi('R3/2012-1-1/P30D'::posttime);
+    SELECT pt_regular_multi_to_multi('R3/2012-1-1/P30D');
     //result:
     'CAL001002012-01-01T00:00:00.000Z,002012-01-31T00:00:00.000Z,
     002012-03-01T00:00:00.000Z,002012-03-31T00:00:00.000Z'
 
-    SELECT pt_regular_multi_to_multi('TCS002R2/21224211/P3123321'::posttime);
+    SELECT pt_regular_multi_to_multi('TCS002R2/21224211/P3123321');
     //result
     'TCS002021224211.000000,210891107532.000000,421760990853.000000'
