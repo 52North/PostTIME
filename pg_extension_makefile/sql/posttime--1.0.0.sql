@@ -1,27 +1,20 @@
--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+--   Copyright 2013-04-23 52North
 --
--- This is free software; you can redistribute and/or modify it under
--- the terms of the GNU General Public Licence. See the COPYING file.
+--   Licensed under the Apache License, Version 2.0 (the "License");
+--   you may not use this file except in compliance with the License.
+--   You may obtain a copy of the License at
 --
--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+--       http://www.apache.org/licenses/LICENSE-2.0
 --
--- WARNING: Any change in this file must be evaluated for compatibility.
---          Changes cleanly handled by postgis_upgrade.sql are fine,
---	    other changes will require a bump in Major version.
---	    Currently only function replaceble by CREATE OR REPLACE
---	    are cleanly handled.
---
--- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-
-
-
-
-
-
+--   Unless required by applicable law or agreed to in writing, software
+--   distributed under the License is distributed on an "AS IS" BASIS,
+--   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--   See the License for the specific language governing permissions and
+--   limitations under the License.
+-------------------------------------------------------------------
+-------------------------------------------------------------------
 
 
 SET client_min_messages TO warning;
@@ -51,6 +44,19 @@ CREATE TYPE posttime (
 );
 
 -------------------------------------------------------------------
+-- ASSIGNMENT CAST FROM TEXT
+-------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION posttime_in(text)
+        RETURNS posttime
+        AS '$libdir/posttime'
+        LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE CAST (text AS posttime)
+        WITH FUNCTION posttime_in(text)
+        AS ASSIGNMENT;
+
+-------------------------------------------------------------------
 -- BASIC DATA PROCESSING FUNCTIONALITY
 -------------------------------------------------------------------
 
@@ -58,7 +64,6 @@ CREATE OR REPLACE FUNCTION pt_transform_system(posttime, cstring)
 	RETURNS posttime
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
-
 
 CREATE OR REPLACE FUNCTION pt_regular_multi_to_multi(posttime)
         RETURNS posttime
