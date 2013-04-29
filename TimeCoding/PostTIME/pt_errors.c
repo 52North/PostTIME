@@ -43,5 +43,7 @@ const pt_error_msg pt_error_msgs[] = {
 		"This values are not representing an valid datum in this calendar"},
 		{SHORT_FORM_AGREEMENT_CONFUSION ,
 		"If you make use of the short form period agreement in a MultiInstant you have to use it for all containing single instants."},
+		{ALL_ARGS_MUST_SHARE_SAME_RS ,
+		"All PostTIME instances used as function arguments have to share the same temporal reference system."}
 };
 

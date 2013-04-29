@@ -5,12 +5,15 @@
 
 #include "parser.h"
 #include "textualizator.h"
+#include "temporal_bbox.h"
 
 // Function Declaration
 Datum posttime_in(PG_FUNCTION_ARGS);
 Datum posttime_out(PG_FUNCTION_ARGS);
 Datum pt_transform_system(PG_FUNCTION_ARGS);
 Datum pt_regular_multi_to_multi(PG_FUNCTION_ARGS);
+Datum pt_temporal_bbox_instance(PG_FUNCTION_ARGS);
+Datum pt_temporal_bbox_two_args(PG_FUNCTION_ARGS);
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
@@ -136,4 +139,34 @@ pt_regular_multi_to_multi(PG_FUNCTION_ARGS){
 	PG_RETURN_POINTER(ptime_ret);
 }
 
+PG_FUNCTION_INFO_V1(pt_temporal_bbox_instance);
+Datum
+pt_temporal_bbox_instance(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_bbox = palloc(sizeof(POSTTIME) + sizeof(JULIAN_DAY));
+	memset(ptime_bbox,'\0', sizeof(POSTTIME) + sizeof(JULIAN_DAY) );
+	
+	temporal_bbox_single_instance( ptime, ptime_bbox );
+	
+	PG_RETURN_POINTER(ptime_bbox);
+}
 
+PG_FUNCTION_INFO_V1(pt_temporal_bbox_two_args);
+Datum
+pt_temporal_bbox_two_args(PG_FUNCTION_ARGS){
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+
+	POSTTIME * ptime_bbox = palloc(sizeof(POSTTIME) + sizeof(JULIAN_DAY));
+	memset(ptime_bbox,'\0', sizeof(POSTTIME) + sizeof(JULIAN_DAY) );
+
+	pt_error_type ret_err = temporal_bbox_single_two_instances( ptime_1 , ptime_2 , ptime_bbox );
+	if( ret_err != NO_ERROR ){
+		FREE_MEM(ptime_bbox);
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
+
+	PG_RETURN_POINTER(ptime_bbox);
+}

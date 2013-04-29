@@ -58,8 +58,28 @@ CREATE CAST (text AS posttime)
 
 -------------------------------------------------------------------
 -- BASIC DATA PROCESSING FUNCTIONALITY
--------------------------------------------------------------------
+-------------------------------------------------------------------        
 
+-------------------------------------------------------------------
+-- Temporal Bounding Box        
+        
+CREATE OR REPLACE FUNCTION pt_temporal_bbox_instance(posttime)
+	RETURNS posttime
+	AS '$libdir/posttime'
+	LANGUAGE 'c' STRICT;
+
+CREATE OR REPLACE FUNCTION pt_temporal_bbox(posttime, posttime)
+	RETURNS posttime
+	AS '$libdir/posttime' , 'pt_temporal_bbox_two_args'
+	LANGUAGE 'c' STRICT;
+	
+CREATE AGGREGATE pt_temporal_bbox (posttime) (
+	SFUNC = pt_temporal_bbox,
+	STYPE = posttime,
+	FINALFUNC = pt_temporal_bbox_instance
+);
+-------------------------------------------------------------------
+	
 CREATE OR REPLACE FUNCTION pt_transform_system(posttime, cstring)
 	RETURNS posttime
 	AS '$libdir/posttime'

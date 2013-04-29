@@ -30,6 +30,7 @@ typedef enum pt_error_type {
 	FUNCTION_UNDEFINED_FOR_ORDINAL,
 	CALENDAR_VALUES_NOT_VALID,
 	SHORT_FORM_AGREEMENT_CONFUSION,
+	ALL_ARGS_MUST_SHARE_SAME_RS,
 } pt_error_type;
 
 typedef struct pt_error_msg {

@@ -1,1 +1,6 @@
 *.so
+results
+regression.diffs
+regression.out
+test_script_make.save
+test_script_make.save2

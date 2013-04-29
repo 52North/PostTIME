@@ -9,7 +9,7 @@ The PostTIME project intends to enhance PostgreSQL's capabilities to handle the 
     * Temporal coordinate systems e.g. UNIX-Time
     * Calendar and clock systems like the Gregorian calendar with UTC
     * Ordinal systems e.g. the geological eras.
-3. *Several __SQL functions__ for your __analysis__ tasks - please see below for more* information about this.
+3. *Several __SQL functions__ for your __analysis__ tasks* - please see [below](https://github.com/52North/PostTIME#posttime-sql-functions) for more information about this.
 
 The concept is basing on ISO19108. The project is in an __early stage__, so please keep in mind that PostTIME is more or less unstable and anything but complete.
 
@@ -29,6 +29,28 @@ You can remove the extension with:
 If you want to undo the installation just remove all files naming posttime from your PostgreSQL *extension* directory and the shared library object from PostgreSQL's *$libdir*.
 
 ###PostTIME SQL functions
+##### pt\_temporal\_bbox( PostTIME , ... ) : PostTIME 
+Calculates the temporal bounding box, i.e. the temporal extent that is covered by the PostTIME instances used as arguments. This is an overloaded function, so you can use a single PostTIME instance or also SETs as arguments. It work's for all reference systems and types. *Examples:*
+
+    // Use it with a single instant.
+    SELECT pt_temporal_bbox('2013-4-29T12:32')
+    // result
+    'CAL001002013-04-29T12:32:00.000Z/002013-04-29T12:32:00.000Z'
+
+    // Up to the regular types.
+    SELECT pt_temporal_bbox('R12/2013-4-29T8/PT8H30M/PT15H30M')
+    // result
+    'CAL001002013-04-29T08:00:00.000Z/002013-05-11T16:30:00.000Z'
+
+    // Or aggregate the temporal bbox directly from a table's attribute.
+    SELECT pt_temporal_bbox(foo_ptime_attribute) FROM foo_table;
+    // result
+    'CAL001002012-09-03T16:33:22.212Z/002021-07-01T00:00:00.000Z'
+
+    // And why not use it with ordinal systems?
+    SELECT pt_temporal_bbox('ORD001Triassic,Paleozoic,Mesozoic,Neogene')
+    // result
+    'ORD001Paleozoic/Neogene'
 
 ##### pt\_transform\_system( PostTIME , text ) : PostTIME 
 Transforms a PostTIME instance into the reference system specified by the given key. *Examples:*
