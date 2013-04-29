@@ -19,6 +19,9 @@ DATE_NUMBERS dn_duration_msec = { 0.001, 0, 0, 0, 0, 0, 0, 0, 0 };
 BYTE parse_single_number(char * str_in, int32 * int_number){
 	int32 int_itr = 0;
 	BYTE byte_ret = 1;
+	if(str_in[0] == '-'){
+		int_itr++;
+	}
 	while(str_in[int_itr] != '\0' && byte_ret == 1){
 		switch(str_in[int_itr]){
 		case '0':
@@ -53,6 +56,9 @@ BYTE parse_single_float(char * str_in, float8 * float_number){
 	int32 int_itr = 0;
 	BYTE byte_ret = 1;
 	BYTE point_flag = 0;
+	if(str_in[0] == '-'){
+		int_itr++;
+	}
 	while(str_in[int_itr] != '\0' && byte_ret == 1){
 		switch(str_in[int_itr]){
 		case '0':
@@ -100,7 +106,11 @@ pt_error_type parse_single_instant_string(char * str_in, DATE_NUMBERS * dn_ret){
 	dn_ret->granularity = YEAR;
 	// Scan in and check.
 	while( i < 5 ){
-    	buf = strchr( str_arr[i], char_delimiter[i] );
+		// Distinguish negative year and first delimiter.
+		if( i == 0 && *str_in == '-' ){
+			buf = strchr( str_in + 1, char_delimiter[i] );
+		}
+		else buf = strchr( str_arr[i], char_delimiter[i] );
     	// No more delimiters - finish.
     	if( buf == NULL ){
     		break;
@@ -312,8 +322,8 @@ pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptim
 
 				for( i = 0; i < int_count_instants; i++ ){
 					ret_err = check_validity( dn_tmp + i , cal_system );
-					ptime_tmp->data[i] = cal_system->dnumber_to_jday( dn_tmp + i );
 					if( ret_err != NO_ERROR ) break;
+					ptime_tmp->data[i] = cal_system->dnumber_to_jday( dn_tmp + i );
 				}
 			}
 		}
