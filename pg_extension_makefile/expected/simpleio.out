@@ -1,0 +1,11 @@
+CREATE EXTENSION posttime;
+SELECT '2012'::posttime;
+                          posttime                           
+-------------------------------------------------------------
+ CAL001002012-01-01T00:00:00.000Z/002012-12-31T23:59:59.999Z
+(1 row)
+
+SELECT '2013/2014/2016'::posttime;
+ERROR:  Assumed that the given string represents a RegularMultiObject, but is not valid in this way.
+LINE 1: SELECT '2013/2014/2016'::posttime;
+               ^
