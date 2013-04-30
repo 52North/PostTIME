@@ -100,11 +100,11 @@ pt_transform_system(PG_FUNCTION_ARGS){
 	memset( ptime_ret, 0 ,VARSIZE(ptime) );
 
 	pt_error_type err = determine_refsys( str_in , dummy , ptime_ret );
-	if( ptime->refsys.type == 3 ) err = FUNCTION_UNDEFINED_FOR_ORDINAL;
+	if( ptime_ret->refsys.type == 3 ) err = FUNCTION_UNDEFINED_FOR_ORDINAL;
 	if(*(dummy[0]) != 0 && err == NO_ERROR) err = SPECIFY_ONLY_THE_NEW_SYSTEM;
 
 	if( err != NO_ERROR ){
-		FREE_MEM(ptime_ret);
+		//FREE_MEM(ptime_ret);
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				errmsg("%s",pt_error_msgs[err].msg)));
 		PG_RETURN_NULL();

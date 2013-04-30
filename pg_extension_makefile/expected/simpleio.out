@@ -1,11 +1,234 @@
 CREATE EXTENSION posttime;
-SELECT '2012'::posttime;
-                          posttime                           
--------------------------------------------------------------
- CAL001002012-01-01T00:00:00.000Z/002012-12-31T23:59:59.999Z
-(1 row)
+CREATE TABLE pt_simpleio_table (id serial, ptime posttime);
+INSERT INTO pt_simpleio_table( ptime )
+VALUES
+/* GREG */
+('2013'),
+('2013-1'),
+('2013-1-31'),
+('CAL0012013'),
+('CAL0012013-1'),
+('CAL0012013-12-13'),
+('2013/2014'),
+('2013-2/2014'),
+('2013-3-4/2014'),
+/* next line # 10 # */
+('2013,2014'),
+('2013-1,2014-2'),
+('2013-1-1,2014-2-3'),
+('2013-2-2T12'),
+('2013-2-2T12:30:40.123'),
+('2013-2-2T12:30:40.123/2013-2-4T12:30:40.123'),
+('2013-2-2T12:30:40.123/2013-2-4T12:30:40.123,2015-2-2T12:30:40.123/2016-2-4T12:30:40.124'),
+('2013-2-2T12:30:40.123,2013-2-4T12:30:40.123,2015-2-2T12:30:40.123,2016-2-4T12:30:40.124'),
+('2013-2-2T12:30:40.123,2013-2-4T12:30:40.123,2015-2-2T12:30:40.123,2016-2-4T12:30:40.124,2017-2-2T12:30:40.123,2018-2-4T12:30:40.123,2019-2-2T12:30:40.123,2020-2-4T12:30:40.124,2021-2-2T12:30:40.123,2022-2-4T12:30:40.123,2023-2-2T12:30:40.123,2024-2-4T12:30:40.124,2013-2-2T12:30:40.123,2025-2-4T12:30:40.123,2026-2-2T12:30:40.123,2027-2-4T12:30:40.124'),
+('R23/2014-2-3/P1D'),
+/* next line # 20 # */
+('R21/2014-2-3/P1D/P2D'),
+('R86/2014-2-3/P1DT2.123S'),
+('R86/2014-2-3/P1DT2.123S/P1Y2M3DT4H5M6.789S'),
+('R86/2014-2-3/P9Y8M7DT6H5M4.321S/P1Y2M3DT4H5M6.789S'),
+('2004-2-29'),
+/* TCS */
+('TCS001123456'),
+('TCS001123456/234567'),
+('TCS001123456,234567'),
+('TCS001123456.123/234567.987'),
+('TCS001123456.123/234567.987,923456.123/1234567.987'),
+/* next line # 30 # */
+('TCS001123456.123,234567.987,923456.123,1234567.987,9123456.123,9234567.987,9923456.123,91234567.987,99123456.123,99234567.987,99923456.123,991234567.987'),
+('TCS001R5/987/P654.321'),
+('TCS001R12/987/P654.321/P123.45678'),
+('TCS002123456'),
+('TCS002123456/234567'),
+('TCS002123456,234567'),
+('TCS002123456.123/234567.987'),
+('TCS002123456.123/234567.987,923456.123/1234567.987'),
+('TCS002123456.123,234567.987,923456.123,1234567.987,9123456.123,9234567.987,9923456.123,91234567.987,99123456.123,99234567.987,99923456.123,991234567.987'),
+/* next line # 40 # */
+('TCS002R8/987/P654.321'),
+('TCS002R21/987/P654.321/P123.45678'),
+/* geologic */
+('ORD001Ediacaran,Neoproterozoic,Proterozoic,Cambrian,Ordovician,Silurian,Devonian,Carboniferous,Paleozoic,Triassic,Jurassic,Mesozoic,Paleogene,Neogene,Quaternary'),
+('ORD001Ediacaran/Proterozoic'),
+('ORD001Ediacaran,Proterozoic'),
+('ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous'),
+('-232'),
+('-4713');
+SELECT * FROM pt_simpleio_table;
+ id |                                                                                                                                                                                                                         ptime                                                                                                                                                                                                                         
+----+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  1 | CAL001002013-01-01T00:00:00.000Z/002013-12-31T23:59:59.999Z
+  2 | CAL001002013-01-01T00:00:00.000Z/002013-01-31T23:59:59.999Z
+  3 | CAL001002013-01-31T00:00:00.000Z/002013-01-31T23:59:59.999Z
+  4 | CAL001002013-01-01T00:00:00.000Z/002013-12-31T23:59:59.999Z
+  5 | CAL001002013-01-01T00:00:00.000Z/002013-01-31T23:59:59.999Z
+  6 | CAL001002013-12-13T00:00:00.000Z/002013-12-13T23:59:59.999Z
+  7 | CAL001002013-01-01T00:00:00.000Z/002014-12-31T23:59:59.999Z
+  8 | CAL001002013-02-01T00:00:00.000Z/002014-12-31T23:59:59.999Z
+  9 | CAL001002013-03-04T00:00:00.000Z/002014-12-31T23:59:59.999Z
+ 10 | CAL001002013-01-01T00:00:00.000Z/002013-12-31T23:59:59.999Z,002014-01-01T00:00:00.000Z/002014-12-31T23:59:59.999Z
+ 11 | CAL001002013-01-01T00:00:00.000Z/002013-01-31T23:59:59.999Z,002014-02-01T00:00:00.000Z/002014-02-28T23:59:59.999Z
+ 12 | CAL001002013-01-01T00:00:00.000Z/002013-01-01T23:59:59.999Z,002014-02-03T00:00:00.000Z/002014-02-03T23:59:59.999Z
+ 13 | CAL001002013-02-02T12:00:00.000Z
+ 14 | CAL001002013-02-02T12:30:40.123Z
+ 15 | CAL001002013-02-02T12:30:40.123Z/002013-02-04T12:30:40.123Z
+ 16 | CAL001002013-02-02T12:30:40.123Z/002013-02-04T12:30:40.123Z,002015-02-02T12:30:40.123Z/002016-02-04T12:30:40.124Z
+ 17 | CAL001002013-02-02T12:30:40.123Z,002013-02-04T12:30:40.123Z,002015-02-02T12:30:40.123Z,002016-02-04T12:30:40.124Z
+ 18 | CAL001002013-02-02T12:30:40.123Z,002013-02-04T12:30:40.123Z,002015-02-02T12:30:40.123Z,002016-02-04T12:30:40.124Z,002017-02-02T12:30:40.123Z,002018-02-04T12:30:40.123Z,002019-02-02T12:30:40.123Z,002020-02-04T12:30:40.124Z,002021-02-02T12:30:40.123Z,002022-02-04T12:30:40.123Z,002023-02-02T12:30:40.123Z,002024-02-04T12:30:40.124Z,002013-02-02T12:30:40.123Z,002025-02-04T12:30:40.123Z,002026-02-02T12:30:40.123Z,002027-02-04T12:30:40.124Z
+ 19 | CAL001R23/002014-02-03T00:00:00.000Z/P1D
+ 20 | CAL001R21/002014-02-03T00:00:00.000Z/P1D/P2D
+ 21 | CAL001R86/002014-02-03T00:00:00.000Z/P1DT2.123S
+ 22 | CAL001R86/002014-02-03T00:00:00.000Z/P1DT2.123S/P1Y2M3DT4H5M6.789S
+ 23 | CAL001R86/002014-02-03T00:00:00.000Z/P9Y8M7DT6H5M4.321S/P1Y2M3DT4H5M6.789S
+ 24 | CAL001002004-02-29T00:00:00.000Z/002004-02-29T23:59:59.999Z
+ 25 | TCS001000123456.000000
+ 26 | TCS001000123456.000000/000234567.000000
+ 27 | TCS001000123456.000000,000234567.000000
+ 28 | TCS001000123456.123000/000234567.987000
+ 29 | TCS001000123456.123000/000234567.987000,000923456.123000/001234567.987000
+ 30 | TCS001000123456.123000,000234567.987000,000923456.123000,001234567.987000,009123456.123000,009234567.987000,009923456.123000,091234567.987000,099123456.123000,099234567.987000,099923456.123000,991234567.987000
+ 31 | TCS001R5/000000987.000000/P654.321000
+ 32 | TCS001R12/000000987.000000/P654.321000/P123.456780
+ 33 | TCS002000123456.000000
+ 34 | TCS002000123456.000000/000234567.000000
+ 35 | TCS002000123456.000000,000234567.000000
+ 36 | TCS002000123456.123000/000234567.987000
+ 37 | TCS002000123456.123000/000234567.987000,000923456.123000/001234567.987000
+ 38 | TCS002000123456.123000,000234567.987000,000923456.123000,001234567.987000,009123456.123000,009234567.987000,009923456.123000,091234567.987000,099123456.123000,099234567.987000,099923456.123000,991234567.987000
+ 39 | TCS002R8/000000987.000000/P654.321000
+ 40 | TCS002R21/000000987.000000/P654.321000/P123.456000
+ 41 | ORD001Ediacaran,Neoproterozoic,Proterozoic,Cambrian,Ordovician,Silurian,Devonian,Carboniferous,Paleozoic,Triassic,Jurassic,Mesozoic,Paleogene,Neogene,Quaternary
+ 42 | ORD001Ediacaran/Proterozoic
+ 43 | ORD001Ediacaran,Proterozoic
+ 44 | ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous
+ 45 | CAL001-00232-01-01T00:00:00.000Z/-00231-01-01T23:59:59.999Z
+ 46 | CAL001-04713-01-01T00:00:00.000Z/-04712-00-30T23:59:59.999Z
+(46 rows)
 
-SELECT '2013/2014/2016'::posttime;
+/* * * error * * */
+SELECT ('-4714')::posttime;
+ERROR:  This values are not representing an valid datum in this calendar
+LINE 2: SELECT ('-4714')::posttime;
+                ^
+SELECT ('2013/2014/2016')::posttime;
 ERROR:  Assumed that the given string represents a RegularMultiObject, but is not valid in this way.
-LINE 1: SELECT '2013/2014/2016'::posttime;
-               ^
+LINE 1: SELECT ('2013/2014/2016')::posttime;
+                ^
+SELECT ('2013-0')::posttime;
+ERROR:  This values are not representing an valid datum in this calendar
+LINE 1: SELECT ('2013-0')::posttime;
+                ^
+SELECT ('201a3-3-21T12:20:32.123')::posttime;
+ERROR:  Syntax error: error while trying to parse a single year, month, day, hour, or minute.
+LINE 1: SELECT ('201a3-3-21T12:20:32.123')::posttime;
+                ^
+SELECT ('2013-1a0-21T12:20:32.123')::posttime;
+ERROR:  Syntax error: error while trying to parse a single year, month, day, hour, or minute.
+LINE 1: SELECT ('2013-1a0-21T12:20:32.123')::posttime;
+                ^
+SELECT ('2013-3-2a1T12:20:32.123')::posttime;
+ERROR:  Syntax error: error while trying to parse a single year, month, day, hour, or minute.
+LINE 1: SELECT ('2013-3-2a1T12:20:32.123')::posttime;
+                ^
+SELECT ('2013-3-21T1a2:20:32.123')::posttime;
+ERROR:  Syntax error: error while trying to parse a single year, month, day, hour, or minute.
+LINE 1: SELECT ('2013-3-21T1a2:20:32.123')::posttime;
+                ^
+SELECT ('2013-3-21T12:2a0:32.123')::posttime;
+ERROR:  Syntax error: error while trying to parse a single year, month, day, hour, or minute.
+LINE 1: SELECT ('2013-3-21T12:2a0:32.123')::posttime;
+                ^
+SELECT ('2013-3-21T12:20:3a2.123')::posttime;
+ERROR:  Syntax error: error while trying to parse seconds.
+LINE 1: SELECT ('2013-3-21T12:20:3a2.123')::posttime;
+                ^
+SELECT ('2013-3-21T12:20:32.123a')::posttime;
+ERROR:  Syntax error: error while trying to parse seconds.
+LINE 1: SELECT ('2013-3-21T12:20:32.123a')::posttime;
+                ^
+/* Start has to be beore end */
+SELECT ('2013/2010')::posttime;
+ERROR:  A valid period's begin instant is before the end instant.
+LINE 2: SELECT ('2013/2010')::posttime;
+                ^
+SELECT ('TCS002567/467')::posttime;
+ERROR:  A valid period's begin instant is before the end instant.
+LINE 1: SELECT ('TCS002567/467')::posttime;
+                ^
+SELECT ('ORD001Proterozoic/Ediacaran')::posttime;
+ERROR:  A valid period's begin instant is before the end instant.
+LINE 1: SELECT ('ORD001Proterozoic/Ediacaran')::posttime;
+                ^
+/* system key does not exists */
+SELECT ('CAL0122013')::posttime;
+ERROR:  A calendar system with the given id is unknown.
+LINE 2: SELECT ('CAL0122013')::posttime;
+                ^
+SELECT ('CAL0022013')::posttime;
+ERROR:  A calendar system with the given id is unknown.
+LINE 1: SELECT ('CAL0022013')::posttime;
+                ^
+/* to much keys */
+SELECT ('TCS001123/TCS002456')::posttime;
+ERROR:  Syntax error: within a temporal coordinate system an instant is defined by a single floating point number.
+LINE 2: SELECT ('TCS001123/TCS002456')::posttime;
+                ^
+/* invalid dates */
+SELECT ('2013-2-29')::posttime;
+ERROR:  This values are not representing an valid datum in this calendar
+LINE 2: SELECT ('2013-2-29')::posttime;
+                ^
+SELECT ('2013-13-29')::posttime;
+ERROR:  This values are not representing an valid datum in this calendar
+LINE 1: SELECT ('2013-13-29')::posttime;
+                ^
+SELECT ('TCS0012013-13-29')::posttime;
+ERROR:  Syntax error: within a temporal coordinate system an instant is defined by a single floating point number.
+LINE 1: SELECT ('TCS0012013-13-29')::posttime;
+                ^
+SELECT ('-5000')::posttime;
+ERROR:  This values are not representing an valid datum in this calendar
+LINE 1: SELECT ('-5000')::posttime;
+                ^
+/* end with delimeter */
+SELECT ('2013-13-27T')::posttime;
+ERROR:  Syntax error: an instant-string can not end with a ISO8601-delimiter as '-','T' or ':' .
+LINE 2: SELECT ('2013-13-27T')::posttime;
+                ^
+SELECT ('2013-13-')::posttime;
+ERROR:  Syntax error: an instant-string can not end with a ISO8601-delimiter as '-','T' or ':' .
+LINE 1: SELECT ('2013-13-')::posttime;
+                ^
+SELECT ('2013-13-27T21:')::posttime;
+ERROR:  Syntax error: an instant-string can not end with a ISO8601-delimiter as '-','T' or ':' .
+LINE 1: SELECT ('2013-13-27T21:')::posttime;
+                ^
+SELECT ('ORD001Proterozoic/Ediacaraan')::posttime;
+ERROR:  The given ordinal-era-key is unknown in the specified system.
+LINE 1: SELECT ('ORD001Proterozoic/Ediacaraan')::posttime;
+                ^
+SELECT ('TCS0211234')::posttime;
+ERROR:  A temporal coordinate system with the given id is unknown.
+LINE 1: SELECT ('TCS0211234')::posttime;
+                ^
+SELECT ('ORD021Proterozoic/Ediacaraan')::posttime;
+ERROR:  An ordinal system with the given id is unknown.
+LINE 1: SELECT ('ORD021Proterozoic/Ediacaraan')::posttime;
+                ^
+SELECT ('R5/2013/2014/P1Y')::posttime;
+ERROR:  Assumed that the given string represents a RegularMultiObject, but is not valid in this way.
+LINE 1: SELECT ('R5/2013/2014/P1Y')::posttime;
+                ^
+SELECT ('R5/2013/P1Y2M3')::posttime;
+ERROR:  An error occurred during parsing a single regular value
+LINE 1: SELECT ('R5/2013/P1Y2M3')::posttime;
+                ^
+SELECT ('R5/2013/P2Y/P1Y2M3')::posttime;
+ERROR:  An error occurred during parsing a single regular value
+LINE 1: SELECT ('R5/2013/P2Y/P1Y2M3')::posttime;
+                ^
+SELECT ('R86/2014-2-3T/P9Y8M7DT6H5M4.321SS/P1Y2M3DT4H5M6.789S')::posttime;
+ERROR:  Syntax error: an instant-string can not end with a ISO8601-delimiter as '-','T' or ':' .
+LINE 1: SELECT ('R86/2014-2-3T/P9Y8M7DT6H5M4.321SS/P1Y2M3DT4H5M6.789...
+                ^

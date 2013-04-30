@@ -18,6 +18,8 @@ PostTIME makes use of the PostgreSQL extension feature so you need PostgreSQL ve
 
 To make PostTIME available as an extension module please download the *TimeCoding* and the *pg_extension_makefile* folder in the same directory. Then run `make` and `make install`.
 
+You can run local regression tests of your PostTIME installation with __`make installcheck`__.
+
 Now you can easily add the PostTIME extension to a database with a CREATE EXTENSION statement like:
 
     CREATE EXTENSION posttime;

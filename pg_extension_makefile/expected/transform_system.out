@@ -1,0 +1,51 @@
+SELECT pt_transform_system('2013-12-24','TCS001');
+           pt_transform_system           
+-----------------------------------------
+ TCS001002456650.500000/002456651.500000
+(1 row)
+
+SELECT pt_transform_system('-4713','TCS001');
+           pt_transform_system           
+-----------------------------------------
+ TCS001-00000326.500000/000000038.500000
+(1 row)
+
+SELECT pt_transform_system('1970-1-1T0:0:0.001','TCS002');
+  pt_transform_system   
+------------------------
+ TCS002000000000.001000
+(1 row)
+
+SELECT pt_transform_system('TCS0021','CAL001');
+       pt_transform_system        
+----------------------------------
+ CAL001001970-01-01T00:00:01.000Z
+(1 row)
+
+SELECT pt_transform_system('TCS0021','TCS001');
+  pt_transform_system   
+------------------------
+ TCS001002440587.500012
+(1 row)
+
+SELECT pt_transform_system('TCS0011','TCS003');
+  pt_transform_system   
+------------------------
+ TCS003086400000.000000
+(1 row)
+
+/* error */
+SELECT pt_transform_system('1970-1-1T0:0:0.001','ORD001');
+ERROR:  This function does not work with Ordinal Systems
+SELECT pt_transform_system('ORD001Triassic','TCS002');
+    pt_transform_system     
+----------------------------
+ TCS002-210866759999.989990
+(1 row)
+
+SELECT pt_transform_system('1970-1-1T0:0:0.001','CAL002');
+ERROR:  A calendar system with the given id is unknown.
+SELECT pt_transform_system('1970-1-1T0:0:0.001','dasdfa');
+ERROR:  Please specify only the new reference system.
+SELECT pt_transform_system('1970-1-1T0:0:0.001','CALCAL');
+ERROR:  Please specify only the new reference system.

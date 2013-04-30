@@ -1,6 +1,98 @@
 CREATE EXTENSION posttime;
 
-SELECT '2012'::posttime;
-SELECT '2013/2014/2016'::posttime;
+CREATE TABLE pt_simpleio_table (id serial, ptime posttime);
 
-CREATE TABLE foo_table_from_regression(id serial);
+INSERT INTO pt_simpleio_table( ptime )
+VALUES
+/* GREG */
+('2013'),
+('2013-1'),
+('2013-1-31'),
+('CAL0012013'),
+('CAL0012013-1'),
+('CAL0012013-12-13'),
+('2013/2014'),
+('2013-2/2014'),
+('2013-3-4/2014'),
+/* next line # 10 # */
+('2013,2014'),
+('2013-1,2014-2'),
+('2013-1-1,2014-2-3'),
+('2013-2-2T12'),
+('2013-2-2T12:30:40.123'),
+('2013-2-2T12:30:40.123/2013-2-4T12:30:40.123'),
+('2013-2-2T12:30:40.123/2013-2-4T12:30:40.123,2015-2-2T12:30:40.123/2016-2-4T12:30:40.124'),
+('2013-2-2T12:30:40.123,2013-2-4T12:30:40.123,2015-2-2T12:30:40.123,2016-2-4T12:30:40.124'),
+('2013-2-2T12:30:40.123,2013-2-4T12:30:40.123,2015-2-2T12:30:40.123,2016-2-4T12:30:40.124,2017-2-2T12:30:40.123,2018-2-4T12:30:40.123,2019-2-2T12:30:40.123,2020-2-4T12:30:40.124,2021-2-2T12:30:40.123,2022-2-4T12:30:40.123,2023-2-2T12:30:40.123,2024-2-4T12:30:40.124,2013-2-2T12:30:40.123,2025-2-4T12:30:40.123,2026-2-2T12:30:40.123,2027-2-4T12:30:40.124'),
+('R23/2014-2-3/P1D'),
+/* next line # 20 # */
+('R21/2014-2-3/P1D/P2D'),
+('R86/2014-2-3/P1DT2.123S'),
+('R86/2014-2-3/P1DT2.123S/P1Y2M3DT4H5M6.789S'),
+('R86/2014-2-3/P9Y8M7DT6H5M4.321S/P1Y2M3DT4H5M6.789S'),
+('2004-2-29'),
+/* TCS */
+('TCS001123456'),
+('TCS001123456/234567'),
+('TCS001123456,234567'),
+('TCS001123456.123/234567.987'),
+('TCS001123456.123/234567.987,923456.123/1234567.987'),
+/* next line # 30 # */
+('TCS001123456.123,234567.987,923456.123,1234567.987,9123456.123,9234567.987,9923456.123,91234567.987,99123456.123,99234567.987,99923456.123,991234567.987'),
+('TCS001R5/987/P654.321'),
+('TCS001R12/987/P654.321/P123.45678'),
+('TCS002123456'),
+('TCS002123456/234567'),
+('TCS002123456,234567'),
+('TCS002123456.123/234567.987'),
+('TCS002123456.123/234567.987,923456.123/1234567.987'),
+('TCS002123456.123,234567.987,923456.123,1234567.987,9123456.123,9234567.987,9923456.123,91234567.987,99123456.123,99234567.987,99923456.123,991234567.987'),
+/* next line # 40 # */
+('TCS002R8/987/P654.321'),
+('TCS002R21/987/P654.321/P123.45678'),
+/* geologic */
+('ORD001Ediacaran,Neoproterozoic,Proterozoic,Cambrian,Ordovician,Silurian,Devonian,Carboniferous,Paleozoic,Triassic,Jurassic,Mesozoic,Paleogene,Neogene,Quaternary'),
+('ORD001Ediacaran/Proterozoic'),
+('ORD001Ediacaran,Proterozoic'),
+('ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous'),
+('-232'),
+('-4713');
+
+SELECT * FROM pt_simpleio_table;
+
+/* * * error * * */
+SELECT ('-4714')::posttime;
+SELECT ('2013/2014/2016')::posttime;
+SELECT ('2013-0')::posttime;
+SELECT ('201a3-3-21T12:20:32.123')::posttime;
+SELECT ('2013-1a0-21T12:20:32.123')::posttime;
+SELECT ('2013-3-2a1T12:20:32.123')::posttime;
+SELECT ('2013-3-21T1a2:20:32.123')::posttime;
+SELECT ('2013-3-21T12:2a0:32.123')::posttime;
+SELECT ('2013-3-21T12:20:3a2.123')::posttime;
+SELECT ('2013-3-21T12:20:32.123a')::posttime;
+/* Start has to be beore end */
+SELECT ('2013/2010')::posttime;
+SELECT ('TCS002567/467')::posttime;
+SELECT ('ORD001Proterozoic/Ediacaran')::posttime;
+/* system key does not exists */
+SELECT ('CAL0122013')::posttime;
+SELECT ('CAL0022013')::posttime;
+/* to much keys */
+SELECT ('TCS001123/TCS002456')::posttime;
+/* invalid dates */
+SELECT ('2013-2-29')::posttime;
+SELECT ('2013-13-29')::posttime;
+SELECT ('TCS0012013-13-29')::posttime;
+SELECT ('-5000')::posttime;
+/* end with delimeter */
+SELECT ('2013-13-27T')::posttime;
+SELECT ('2013-13-')::posttime;
+SELECT ('2013-13-27T21:')::posttime;
+SELECT ('ORD001Proterozoic/Ediacaraan')::posttime;
+SELECT ('TCS0211234')::posttime;
+SELECT ('ORD021Proterozoic/Ediacaraan')::posttime;
+SELECT ('R5/2013/2014/P1Y')::posttime;
+SELECT ('R5/2013/P1Y2M3')::posttime;
+SELECT ('R5/2013/P2Y/P1Y2M3')::posttime;
+SELECT ('R86/2014-2-3T/P9Y8M7DT6H5M4.321SS/P1Y2M3DT4H5M6.789S')::posttime;
