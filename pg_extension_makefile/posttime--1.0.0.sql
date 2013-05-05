@@ -90,3 +90,15 @@ CREATE OR REPLACE FUNCTION pt_regular_multi_to_multi(posttime)
         AS '$libdir/posttime'
         LANGUAGE 'c' IMMUTABLE STRICT;
 
+-------------------------------------------------------------------
+-- ISO19108 basic analysis for primitives
+
+CREATE OR REPLACE FUNCTION tm_relative_position(posttime, posttime)
+	RETURNS cstring
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION tm_relative_position_int(posttime, posttime)
+	RETURNS integer
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;

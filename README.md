@@ -1,4 +1,4 @@
-### PostTIME
+# PostTIME
 The PostTIME project intends to enhance PostgreSQL's capabilities to handle the temporal dimension with a focus on processing spatial information. For that purpose it provides:
 
 1. *__6__ different __object types__ to abstract time*
@@ -13,7 +13,7 @@ The PostTIME project intends to enhance PostgreSQL's capabilities to handle the 
 
 The concept is basing on ISO19108. The project is in an __early stage__, so please keep in mind that PostTIME is more or less unstable and anything but complete.
 
-###Install instructions - Set up as PostgreSQL extension
+#Install instructions - Set up as PostgreSQL extension
 PostTIME makes use of the PostgreSQL extension feature so you need PostgreSQL version 9.1 or higher. For more information see the [PostgreSQL documentation](http://www.postgresql.org/docs/ "www.postgresql.org/docs/").
 
 To make PostTIME available as an extension module please download the *TimeCoding* and the *pg_extension_makefile* folder in the same directory. Then run `make` and `make install`.
@@ -30,27 +30,51 @@ You can remove the extension with:
 
 If you want to undo the installation just remove all files naming posttime from your PostgreSQL *extension* directory and the shared library object from PostgreSQL's *$libdir*.
 
-###PostTIME SQL functions
+#PostTIME SQL functions
+##ISO19108 Functions
+The following functions are taken over from ISO19108 - for that reason these are only defined for the primitive object types. However, if you call one of these with a multi object you will get 'NAP' if the return type is text or '-1' if the return type is a number. That means you can call these functions with any PostTIME instance without causing an error.   
+##### tm\_relative\_position( PostTIME , PostTIME ) : text 
+Determine the relative position of one inctance to another and returns the result as a string according to ISO19108. *Examples:*
+
+    // Calendar system...
+    SELECT tm_relative_position('2013-6-11T9:12','2013-5-30/2016-2-29');
+    // result
+    'During'
+
+     // ...coordinate system...
+    SELECT tm_relative_position('TCS0028765/9765','TCS0029000/10000');
+    // result
+    'Overlaps'
+
+    // ...or also using an ordinal system.
+    SELECT tm_relative_position('ORD001Neoproterozoic/Ordovician','ORD001Devonian');
+    // result
+    'Before'
+
+The function __tm\_relative\_position\_int( PostTIME , PostTIME ) : integer__ performs the same operation but returns an integer with the matching value from the ISO19108 enumeration type TM_RelativePosition.
+
+##Basic Functions
+
 ##### pt\_temporal\_bbox( PostTIME , ... ) : PostTIME 
 Calculates the temporal bounding box, i.e. the temporal extent that is covered by the PostTIME instances used as arguments. This is an overloaded function, so you can use a single PostTIME instance or also SETs as arguments. It work's for all reference systems and types. *Examples:*
 
     // Use it with a single instant.
-    SELECT pt_temporal_bbox('2013-4-29T12:32')
+    SELECT pt_temporal_bbox('2013-4-29T12:32');
     // result
-    'CAL001002013-04-29T12:32:00.000Z/002013-04-29T12:32:00.000Z'
+    'CAL0012013-04-29T12:32:00.000Z/2013-04-29T12:32:00.000Z'
 
     // Up to the regular types.
-    SELECT pt_temporal_bbox('R12/2013-4-29T8/PT8H30M/PT15H30M')
+    SELECT pt_temporal_bbox('R12/2013-4-29T8/PT8H30M/PT15H30M');
     // result
-    'CAL001002013-04-29T08:00:00.000Z/002013-05-11T16:30:00.000Z'
+    'CAL0012013-04-29T08:00:00.000Z/2013-05-11T16:30:00.000Z'
 
     // Or aggregate the temporal bbox directly from a table's attribute.
     SELECT pt_temporal_bbox(foo_ptime_attribute) FROM foo_table;
     // result
-    'CAL001002012-09-03T16:33:22.212Z/002021-07-01T00:00:00.000Z'
+    'CAL0012012-09-03T16:33:22.212Z/2021-07-01T00:00:00.000Z'
 
     // And why not use it with ordinal systems?
-    SELECT pt_temporal_bbox('ORD001Triassic,Paleozoic,Mesozoic,Neogene')
+    SELECT pt_temporal_bbox('ORD001Triassic,Paleozoic,Mesozoic,Neogene');
     // result
     'ORD001Paleozoic/Neogene'
 
@@ -58,32 +82,33 @@ Calculates the temporal bounding box, i.e. the temporal extent that is covered b
 Transforms a PostTIME instance into the reference system specified by the given key. *Examples:*
 
     // UNIX time to gregorian calendar.
-    SELECT pt_transform_system('TCS0021', 'CAL001')
-    //result
-    'CAL001001970-01-01T00:00:01.000Z'
+    SELECT pt_transform_system('TCS0021', 'CAL001');
+    // result
+    'CAL0011970-01-01T00:00:01.000Z'
 
      // or calendar date to julian day
-    SELECT pt_transform_system('CAL0012013-4-30', 'TCS001')
-    'TCS001002456412.500000'
+    SELECT pt_transform_system('CAL0012013-4-30T12:20', 'TCS001');
+    // result
+    'TCS0012456413.013889'
 
 ##### pt\_regular\_multi_to\_multi( PostTIME ) : PostTIME 
 This function transform's an RegularMultiObject into a normal MultiObject, what means you get concrete instants. *Examples:*
 
     SELECT pt_regular_multi_to_multi('R3/2012-1-1/P3M/P9M');
-    //result:  
-    'CAL001002012-01-01T00:00:00.000Z/002012-04-01T00:00:00.000Z,
-    002013-01-01T00:00:00.000Z/002013-04-01T00:00:00.000Z,
-    002014-01-01T00:00:00.000Z/002014-04-01T00:00:00.000Z,
-    002015-01-01T00:00:00.000Z/002015-04-01T00:00:00.000Z'
+    // result:  
+    CAL0012012-01-01T00:00:00.000Z/2012-04-01T00:00:00.000Z,
+    2013-01-01T00:00:00.000Z/2013-04-01T00:00:00.000Z,
+    2014-01-01T00:00:00.000Z/2014-04-01T00:00:00.000Z,
+    2015-01-01T00:00:00.000Z/2015-04-01T00:00:00.000Z'
 
     SELECT pt_regular_multi_to_multi('R3/2012-1-1/P30D');
-    //result:
-    'CAL001002012-01-01T00:00:00.000Z,002012-01-31T00:00:00.000Z,
-    002012-03-01T00:00:00.000Z,002012-03-31T00:00:00.000Z'
+    // result:
+    'CAL0012012-01-01T00:00:00.000Z,2012-01-31T00:00:00.000Z,
+    2012-03-01T00:00:00.000Z,2012-03-31T00:00:00.000Z'
 
     SELECT pt_regular_multi_to_multi('TCS002R2/21224211/P3123321');
-    //result
-    'TCS002021224211.000000,210891107532.000000,421760990853.000000'
+    // result
+    'TCS00221224211.000000,210891107532.000000,421760990853.000000'
 
 ###Doxygen source code documentation
 Follow [link](http://141.30.100.164:8080) to the doxygen documentation files of the source code.

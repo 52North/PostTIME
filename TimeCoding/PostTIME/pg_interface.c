@@ -6,6 +6,7 @@
 #include "parser.h"
 #include "textualizator.h"
 #include "temporal_bbox.h"
+#include "relative_position.h"
 
 // Function Declaration
 Datum posttime_in(PG_FUNCTION_ARGS);
@@ -14,6 +15,8 @@ Datum pt_transform_system(PG_FUNCTION_ARGS);
 Datum pt_regular_multi_to_multi(PG_FUNCTION_ARGS);
 Datum pt_temporal_bbox_instance(PG_FUNCTION_ARGS);
 Datum pt_temporal_bbox_two_args(PG_FUNCTION_ARGS);
+Datum tm_relative_position(PG_FUNCTION_ARGS);
+Datum tm_relative_position_int(PG_FUNCTION_ARGS);
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
@@ -85,8 +88,8 @@ posttime_out(PG_FUNCTION_ARGS){
     char * str_final = palloc(sizeof(char)*(str_length+1));
     memset(str_final, '\0', sizeof(char)*(str_length+1));
     strncpy(str_final, str_out, str_length);
-
-    PG_RETURN_CSTRING(str_out);
+    FREE_MEM(str_out);
+    PG_RETURN_CSTRING(str_final);
 }
 
 PG_FUNCTION_INFO_V1(pt_transform_system);
@@ -169,4 +172,43 @@ pt_temporal_bbox_two_args(PG_FUNCTION_ARGS){
 	}
 
 	PG_RETURN_POINTER(ptime_bbox);
+}
+
+PG_FUNCTION_INFO_V1(tm_relative_position);
+Datum
+tm_relative_position(PG_FUNCTION_ARGS){
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+
+	char * str_out = palloc(sizeof(char) * 20);
+	memset(str_out, '\0', sizeof(char) * 20);
+
+	pt_error_type ret_err = relative_position_str( ptime_1 , ptime_2 , str_out );
+	if( ret_err != NO_ERROR ){
+		FREE_MEM(str_out);
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
+
+	int32 str_length = 0;
+	str_length = strlen(str_out);
+
+    char * str_final = palloc(sizeof(char)*(str_length+1));
+    memset(str_final, '\0', sizeof(char)*(str_length+1));
+    strncpy(str_final, str_out, str_length);
+    FREE_MEM(str_out);
+    PG_RETURN_CSTRING(str_final);
+}
+
+PG_FUNCTION_INFO_V1(tm_relative_position_int);
+Datum
+tm_relative_position_int(PG_FUNCTION_ARGS){
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	int32 int_ret = 0;
+
+	relative_position_int( ptime_1 , ptime_2 , &int_ret );
+
+    PG_RETURN_INT32(int_ret);
 }
