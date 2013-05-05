@@ -48,4 +48,4 @@ ERROR:  A calendar system with the given id is unknown.
 SELECT pt_transform_system('1970-1-1T0:0:0.001','dasdfa');
 ERROR:  Please specify only the new reference system.
 SELECT pt_transform_system('1970-1-1T0:0:0.001','CALCAL');
-ERROR:  Please specify only the new reference system.
+ERROR:  Can not read the given reference system key.

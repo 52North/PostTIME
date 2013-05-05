@@ -80,7 +80,7 @@ pt_error_type determine_refsys(char * str_in, char *strs_out[], POSTTIME * ptime
 		break;
 	case 1:
 		strncpy(key, str_in + 3, 3);
-		if( !parse_single_number(key, &int_key) ) return 0;
+		if( !parse_single_number(key, &int_key) ) return CAN_NOT_PARSE_REFERENCE_SYSTEM_KEY;
 		for( i = 0; i < NUMBER_OF_CAL_SYS; i++ ){
 			if( calendar_systems[i].id == int_key ) {
 				instance = int_key;

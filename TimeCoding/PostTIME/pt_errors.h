@@ -31,6 +31,7 @@ typedef enum pt_error_type {
 	CALENDAR_VALUES_NOT_VALID,
 	SHORT_FORM_AGREEMENT_CONFUSION,
 	ALL_ARGS_MUST_SHARE_SAME_RS,
+	CAN_NOT_PARSE_REFERENCE_SYSTEM_KEY,
 } pt_error_type;
 
 typedef struct pt_error_msg {
