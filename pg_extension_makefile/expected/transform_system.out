@@ -1,37 +1,37 @@
 SELECT pt_transform_system('2013-12-24','TCS001');
-           pt_transform_system           
------------------------------------------
- TCS001002456650.500000/002456651.500000
+         pt_transform_system         
+-------------------------------------
+ TCS0012456650.500000/2456651.500000
 (1 row)
 
 SELECT pt_transform_system('-4713','TCS001');
-           pt_transform_system           
------------------------------------------
- TCS001-00000326.500000/000000038.500000
+     pt_transform_system     
+-----------------------------
+ TCS001-326.500000/38.500000
 (1 row)
 
 SELECT pt_transform_system('1970-1-1T0:0:0.001','TCS002');
-  pt_transform_system   
-------------------------
- TCS002000000000.001000
+ pt_transform_system 
+---------------------
+ TCS0020.001000
 (1 row)
 
 SELECT pt_transform_system('TCS0021','CAL001');
-       pt_transform_system        
-----------------------------------
- CAL001001970-01-01T00:00:01.000Z
+      pt_transform_system       
+--------------------------------
+ CAL0011970-01-01T00:00:01.000Z
 (1 row)
 
 SELECT pt_transform_system('TCS0021','TCS001');
-  pt_transform_system   
-------------------------
- TCS001002440587.500012
+ pt_transform_system  
+----------------------
+ TCS0012440587.500012
 (1 row)
 
 SELECT pt_transform_system('TCS0011','TCS003');
-  pt_transform_system   
-------------------------
- TCS003086400000.000000
+  pt_transform_system  
+-----------------------
+ TCS00386400000.000000
 (1 row)
 
 /* error */

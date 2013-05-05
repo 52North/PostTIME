@@ -13,13 +13,13 @@ void refsys_tag( POSTTIME * ptime , char * str_out ){
 
 void julianday_cat_instantstring(float8 * value, char * str){
 	char str1[27];
-	snprintf(str1,27,"%016.6lf",*value);
+	snprintf(str1,27,"%.6lf",*value);
 	strncat(str,str1,27);
 }
 
 void date_numbers_to_instant_string(DATE_NUMBERS * dn, char * str_out){
 	char str_tmp[28];
-	snprintf(str_tmp, 28, "%06d-%02d-%02dT%02d:%02d:%06.3lfZ",dn->yea,dn->mon,dn->day,dn->hou,dn->min,dn->sec);
+	snprintf(str_tmp, 28, "%d-%02d-%02dT%02d:%02d:%06.3lfZ",dn->yea,dn->mon,dn->day,dn->hou,dn->min,dn->sec);
 	strncat( str_out ,str_tmp, 27 );
 }
 
