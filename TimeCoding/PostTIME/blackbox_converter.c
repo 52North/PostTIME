@@ -226,15 +226,15 @@ void adjust_dn_to_granularity( DATE_NUMBERS * dn_in_out , calendar_era * cal ){
 	switch(dn_in_out->granularity){
 	case YEAR:
 		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_year , cal );
-		*dn_in_out = dn_minus_dn( dn_in_out , &dn_duration_msec , cal );
+		*dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
 		break;
 	case MONTH:
 		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_mon , cal );
-		*dn_in_out = dn_minus_dn( dn_in_out , &dn_duration_msec , cal );
+		*dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
 		break;
 	case DAY:
 		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_day , cal );
-		*dn_in_out = dn_minus_dn( dn_in_out , &dn_duration_msec , cal );
+		*dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
 		break;
 	default:
 		break;

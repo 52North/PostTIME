@@ -14,5 +14,6 @@
 #define TEXTUALIZATOR_H_
 
 int32 ptime_to_string( POSTTIME * ptime , char * str_out , int32 * int_count );
+void dn_duration_to_string(DATE_NUMBERS * dn, char * str);
 
 #endif /* TEXTUALIZATOR_H_ */

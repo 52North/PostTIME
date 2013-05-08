@@ -118,11 +118,11 @@ DATE_NUMBERS dn_plus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_add, calendar_er
  * @param[in] dn_minus The period - also as DATE_NUMBERS.
  * @param[in] cal Process according to this system.
  * \return The result as DATE_NUMBERS. */
-DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar_era * cal){
+DATE_NUMBERS dn_minus_period(DATE_NUMBERS * dn_in, DATE_NUMBERS * period_minus, calendar_era * cal){
 	DATE_NUMBERS ret_dn, dn_minus_intern;
 	BYTE is_leap;
 	memset(&ret_dn, '\0', sizeof(DATE_NUMBERS));
-	memcpy(&dn_minus_intern, dn_minus, sizeof(DATE_NUMBERS));
+	memcpy(&dn_minus_intern, period_minus, sizeof(DATE_NUMBERS));
 	ret_dn.sec = dn_in->sec - dn_minus_intern.sec;
 	while(ret_dn.sec < 0){
 		ret_dn.sec = ret_dn.sec + 60;
@@ -169,6 +169,55 @@ DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar
 			ret_dn.day = ret_dn.day + max_day;
 		}
 	} while( ret_dn.mon != mon_tmp || ret_dn.yea != yea_tmp );
+	return ret_dn;
+}
+
+DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_later, DATE_NUMBERS * dn_earlier, calendar_era * cal){
+	DATE_NUMBERS ret_dn, dn_minus_intern;
+	BYTE is_leap;
+	memset(&ret_dn, '\0', sizeof(DATE_NUMBERS));
+	memcpy(&dn_minus_intern, dn_earlier, sizeof(DATE_NUMBERS));
+	ret_dn.sec = dn_later->sec - dn_minus_intern.sec;
+	while(ret_dn.sec < 0){
+		ret_dn.sec = ret_dn.sec + 60;
+		dn_minus_intern.min++;
+	}
+	ret_dn.min = dn_later->min - dn_minus_intern.min;
+	while(ret_dn.min < 0){
+		ret_dn.min = ret_dn.min + 60;
+		dn_minus_intern.hou++;
+	}
+	ret_dn.hou = dn_later->hou - dn_minus_intern.hou;
+	while(ret_dn.hou < 0){
+		ret_dn.hou = ret_dn.hou + 24;
+		dn_minus_intern.day++;
+	}
+	int32 max_day, max_month;
+	ret_dn.day = dn_later->day - dn_minus_intern.day;
+	ret_dn.mon = dn_later->mon - dn_minus_intern.mon;
+	ret_dn.yea = dn_later->yea - dn_minus_intern.yea;
+
+	is_leap = cal->is_leap_fct(dn_minus_intern.yea);
+	if( ret_dn.day < 0 ){
+		if(is_leap){
+			max_day = cal->days_per_month_leap[dn_minus_intern.mon - 1];
+		}
+		else {
+			max_day = cal->days_per_month[dn_minus_intern.mon - 1];
+		}
+		ret_dn.day = ret_dn.day + max_day;
+		ret_dn.mon--;
+	}
+	if( ret_dn.mon < 0 ){
+		if(is_leap){
+			max_month = cal->month_per_year_leap;
+		}
+		else {
+			max_month = cal->month_per_year;
+		}
+		ret_dn.mon = ret_dn.mon + max_month;
+		ret_dn.yea--;
+	}
 	return ret_dn;
 }
 

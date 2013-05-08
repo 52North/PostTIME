@@ -102,3 +102,13 @@ CREATE OR REPLACE FUNCTION tm_relative_position_int(posttime, posttime)
 	RETURNS integer
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
+	
+CREATE OR REPLACE FUNCTION tm_distance(posttime, posttime)
+	RETURNS cstring
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION tm_distance_dec_day(posttime, posttime)
+	RETURNS double precision
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;

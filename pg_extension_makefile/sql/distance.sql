@@ -1,15 +1,15 @@
-CREATE TABLE test4posttime
+CREATE TABLE test4posttime_distance
 (
   id serial NOT NULL,
   posttime_1 posttime,
   posttime_2 posttime,
-  CONSTRAINT test4posttime_pkey PRIMARY KEY (id)
+  CONSTRAINT test4posttime_distance_pkey PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
 );
 
-INSERT INTO test4posttime (posttime_1, posttime_2)
+INSERT INTO test4posttime_distance (posttime_1, posttime_2)
 VALUES 
 ('2010-4-12T14:23:42','2010-4-12T14:23:42'),
 ('2010-5-12T14:23:42','2010-4-12T14:23:42'),
@@ -41,8 +41,6 @@ VALUES
 ('2009-7-1/2009-10-1T12','2009-10-1/2012-10-1'),
 ('TCS0012456157.0157','TCS0012456156.09/2456157.07553'),
 ('TCS0012456157.07553','TCS0012456156.09'),
-('ORD001Neoproterozoic','ORD001Ordovician'),
-('ORD001Devonian','ORD001Triassic'),
 ('2012-5-14T19:27:22.2','2012-7-14T19:27:22.2'),
 ('2012-8-14T19:27:22.2','2012-7-14T19:27:22.2'),
 ('2012-7-14T19:27:22.2','2012-7-14T20:27:22.2'),
@@ -51,15 +49,7 @@ VALUES
 ('2010-5-12T14:23:42','2010-4-12T14:23:42,2011,2013,2015'),
 ('2010-3-12T14:23:42/2013,2017/2019','2010-4-12T14:23:42');
 
-SELECT tm_relative_position(posttime_1, posttime_2) FROM test4posttime;
+SELECT tm_distance(posttime_1, posttime_2) FROM test4posttime_distance;
 
-SELECT tm_relative_position_int(posttime_1, posttime_2) FROM test4posttime;
-
-
-SELECT tm_relative_position('2012-7-10T10:00/2012-9-17T12:12:12.122,2012-7-10T10:00/2012-9-17T12:12:12.122','2012-7-10T10:00/2012-9-17T12:12:12.122');
-SELECT tm_relative_position('R8/2002-12-30T12:20:30.456/P2Y3M4DT5H6M7.89S','R8/2002-11-29T12:20:30.123/P2Y3M4DT5H6M');
-SELECT tm_relative_position('TCS0012111222.345678,2111223.345678,2111224.345678','TCS0012111223.345678/2111225.345678,2111226.345678/2111227.345678');
-SELECT tm_relative_position_int('2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020','3000');
-SELECT tm_relative_position_int('2010-3-12T14:23:42,2010-4-12T14:23:42', '2010-4-12T14:23:42');
-SELECT tm_relative_position_int('ORD001Neoproterozoic/Ordovician','ORD001Devonian/Triassic');
+SELECT tm_distance_dec_day(posttime_1, posttime_2) FROM test4posttime_distance;
 

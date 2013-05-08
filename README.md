@@ -32,7 +32,7 @@ If you want to undo the installation just remove all files naming posttime from 
 
 #PostTIME SQL functions
 ##ISO19108 Functions
-The following functions are taken over from ISO19108 - for that reason these are only defined for the primitive object types. However, if you call one of these with a multi object you will get 'NAP' if the return type is text or '-1' if the return type is a number. That means you can call these functions with any PostTIME instance without causing an error.   
+The following functions are taken over from ISO19108 - for that reason these are only defined for the primitive object types. However, if you call one of these with a multi object you will get 'NAP' if the return type is text or '-1' if the return type is numeric. That means you can call these functions with any PostTIME instance without causing an error.   
 ##### tm\_relative\_position( PostTIME , PostTIME ) : text 
 Determine the relative position of one inctance to another and returns the result as a string according to ISO19108. *Examples:*
 
@@ -52,6 +52,31 @@ Determine the relative position of one inctance to another and returns the resul
     'Before'
 
 The function __tm\_relative\_position\_int( PostTIME , PostTIME ) : integer__ performs the same operation but returns an integer with the matching value from the ISO19108 enumeration type TM_RelativePosition.
+
+##### tm\_distance( PostTIME , PostTIME ) : text 
+This function calculates the distance between two primitive objects and return the result als ISO8601-duration-string. If the instances are using a temporal coordinate system the gregrioan calendar's rules will be used for calculation. *Examples*:
+
+    SELECT tm_distance('2013-5-8T16:14:12.345','2013-5-9T22:21:20.191');
+    // result
+    'P1DT6H7M7.846S'
+
+    SELECT tm_distance('TCS0021368029652.345000','TCS0021368138080.191000');
+    // result
+    'P1DT6H7M7.846S'
+
+    SELECT tm_distance('2010/2016-2-29T12','2038-1-19T03:14:08');
+    // result
+    'P21Y10M18DT15H14M8.000S'
+
+Use instead the __tm\_distance\_dec\_day( PostTIME , PostTIME ) : double precision__ function to get the duration between the two instances in decimal days:
+
+    SELECT tm_distance_dec_day('2013-5-8T16:14:12.345','2013-5-9T22:21:20.191');
+    // result
+    1.2549519212963
+
+    SELECT tm_distance_dec_day('2010-5-12T14:23:42','2010-4-12T14:23:42')
+    // result
+    30
 
 ##Basic Functions
 
@@ -110,5 +135,5 @@ This function transform's an RegularMultiObject into a normal MultiObject, what 
     // result
     'TCS00221224211.000000,210891107532.000000,421760990853.000000'
 
-###Doxygen source code documentation
+##Doxygen source code documentation
 Follow [link](http://141.30.100.164:8080) to the doxygen documentation files of the source code.

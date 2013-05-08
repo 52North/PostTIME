@@ -47,5 +47,9 @@ const pt_error_msg pt_error_msgs[] = {
 		"All PostTIME instances used as function arguments have to share the same temporal reference system."},
 		{CAN_NOT_PARSE_REFERENCE_SYSTEM_KEY,
 		"Can not read the given reference system key."},
+		{ ISO19108_ONLY_FOR_PRIMITIVES,
+		"This function is taken over from ISO19108 and only for the primitive object types defined."},
+		{ISO19108_NOT_FOR_ORDINAL_SYSTEMS,
+		"This function can not be used with an ordinal system."},
 };
 

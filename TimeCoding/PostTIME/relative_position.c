@@ -139,6 +139,7 @@ pt_error_type relative_position_str(POSTTIME * ptime_1 , POSTTIME * ptime_2 , ch
 pt_error_type relative_position_int(POSTTIME * ptime_1,POSTTIME * ptime_2, int32 * ret_int32){
 	pt_error_type err_ret = NO_ERROR;
 	if( (ptime_1->type > 2) || (ptime_2->type > 2) ){
+		// err_ret = ISO19108_ONLY_FOR_PRIMITIVES;
 		*ret_int32 = -1;
 	}
 	else if((ptime_1->type == 1) && (ptime_2->type == 1)){
