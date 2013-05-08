@@ -53,3 +53,7 @@ SELECT tm_distance(posttime_1, posttime_2) FROM test4posttime_distance;
 
 SELECT tm_distance_dec_day(posttime_1, posttime_2) FROM test4posttime_distance;
 
+SELECT tm_duration(posttime_1) FROM test4posttime_distance;
+
+SELECT tm_duration_dec_day(posttime_1) FROM test4posttime_distance;
+

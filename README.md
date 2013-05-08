@@ -78,6 +78,12 @@ Use instead the __tm\_distance\_dec\_day( PostTIME , PostTIME ) : double precisi
     // result
     30
 
+The functions __tm\_duration( PostTIME ) : text__ and __tm\_duration\_dec\_day( PostTIME) : double precision__ are quite similar to the distance functions, with the difference that they determine the duration of a single primitive:
+
+    SELECT tm_duration('2013-5-30T8/2013-5-30T12:45');
+    // result
+    'PT4H45M'
+
 ##Basic Functions
 
 ##### pt\_temporal\_bbox( PostTIME , ... ) : PostTIME 

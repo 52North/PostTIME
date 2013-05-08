@@ -20,6 +20,9 @@ Datum tm_relative_position(PG_FUNCTION_ARGS);
 Datum tm_relative_position_int(PG_FUNCTION_ARGS);
 Datum tm_distance(PG_FUNCTION_ARGS);
 Datum tm_distance_dec_day(PG_FUNCTION_ARGS);
+Datum tm_duration(PG_FUNCTION_ARGS);
+Datum tm_duration_dec_day(PG_FUNCTION_ARGS);
+
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
@@ -266,6 +269,59 @@ tm_distance_dec_day(PG_FUNCTION_ARGS){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
 	else ret_err = distance_jul_day( ptime_1 , ptime_2 , &float_ret );
+
+	if( ret_err != NO_ERROR ){
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
+
+    PG_RETURN_FLOAT8(float_ret);
+}
+
+PG_FUNCTION_INFO_V1(tm_duration);
+Datum
+tm_duration(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+
+	char * str_out = palloc(sizeof(char) * 80);
+	memset(str_out, '\0', sizeof(char) * 80);
+
+	pt_error_type ret_err = NO_ERROR;
+	if( ptime->refsys.type == 3 ){
+		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
+	}
+	else ret_err = duration_string( ptime , str_out );
+
+	if( ret_err != NO_ERROR ){
+		FREE_MEM(str_out);
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
+
+	int32 str_length = 0;
+	str_length = strlen(str_out);
+
+    char * str_final = palloc(sizeof(char)*(str_length+1));
+    memset(str_final, '\0', sizeof(char)*(str_length+1));
+    strncpy(str_final, str_out, str_length);
+
+	FREE_MEM(str_out);
+    PG_RETURN_CSTRING(str_final);
+}
+
+PG_FUNCTION_INFO_V1(tm_duration_dec_day);
+Datum
+tm_duration_dec_day(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+	float8 float_ret = 0;
+
+	pt_error_type ret_err = NO_ERROR;
+	if( ptime->refsys.type == 3 ){
+		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
+	}
+	else ret_err = duration_jul_day( ptime , &float_ret );
 
 	if( ret_err != NO_ERROR ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),

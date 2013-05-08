@@ -133,3 +133,87 @@ SELECT tm_distance_dec_day(posttime_1, posttime_2) FROM test4posttime_distance;
                   -1
 (37 rows)
 
+SELECT tm_duration(posttime_1) FROM test4posttime_distance;
+ tm_duration 
+-------------
+ P0
+ P0
+ P0
+ P1D
+ P1D
+ P1D
+ P1D
+ P1D
+ P0
+ P0
+ P0
+ P0
+ P0
+ P2Y1D
+ P3Y
+ P11Y1D
+ P2Y1D
+ P15Y1D
+ P2Y1D
+ P18Y1D
+ P13Y1D
+ P14Y1D
+ P11Y1D
+ P16Y1D
+ P2Y
+ P3442Y
+ P0
+ P3MT12H
+ P0
+ P0
+ P0
+ P0
+ P0
+ P0
+ NAP
+ P0
+ NAP
+(37 rows)
+
+SELECT tm_duration_dec_day(posttime_1) FROM test4posttime_distance;
+ tm_duration_dec_day 
+---------------------
+                   0
+                   0
+                   0
+                   1
+                   1
+                   1
+                   1
+                   1
+                   0
+                   0
+                   0
+                   0
+                   0
+                 732
+                1096
+                4019
+                 731
+                5480
+                 732
+                6576
+                4749
+                5115
+                4019
+                5845
+                 731
+             1257164
+                   0
+                92.5
+                   0
+                   0
+                   0
+                   0
+                   0
+                   0
+                  -1
+                   0
+                  -1
+(37 rows)
+

@@ -112,3 +112,13 @@ CREATE OR REPLACE FUNCTION tm_distance_dec_day(posttime, posttime)
 	RETURNS double precision
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
+	
+CREATE OR REPLACE FUNCTION tm_duration(posttime)
+	RETURNS cstring
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+
+CREATE OR REPLACE FUNCTION tm_duration_dec_day(posttime)
+	RETURNS double precision
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;

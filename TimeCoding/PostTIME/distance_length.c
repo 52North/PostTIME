@@ -94,7 +94,7 @@ pt_error_type distance_string(POSTTIME * ptime1, POSTTIME * ptime2, char * dista
 				break;
 			default:
 				// distance is 0
-				strcpy( distance_out , "P0" );
+				strcpy( distance_out , P0_8601_STRING );
 				break;
 			}
 		}
@@ -104,3 +104,58 @@ pt_error_type distance_string(POSTTIME * ptime1, POSTTIME * ptime2, char * dista
 	}
 	return err_ret;
 }
+
+pt_error_type duration_jul_day( POSTTIME * ptime , float8 * jul_day_out){
+	pt_error_type err_ret = NO_ERROR;
+
+	if( ptime->type > 2 ){
+		*jul_day_out = -1;
+	}
+	else if ( ptime->type == 1 ){
+		*jul_day_out = 0;
+	}
+	else if ( ptime->type == 2 ){
+		*jul_day_out = (ptime->data[1] - ptime->data[0]) / (float8) MILLIS;
+	}
+	return err_ret;
+}
+
+pt_error_type duration_string(POSTTIME * ptime, char * duration_out){
+	pt_error_type err_ret = NO_ERROR;
+	int32 relative_pos = 0;
+
+	if( ptime->type > 2 ){
+		strcpy( duration_out , "NAP" );
+	}
+	else if ( ptime->type == 1 ){
+		strcpy( duration_out , P0_8601_STRING );
+	}
+	else if ( ptime->type == 2 ){
+		calendar_era * the_cal;
+		if( ptime->refsys.type == 2 ){
+			the_cal = get_system_from_key( 1 );
+		}
+		else{
+			the_cal = get_system_from_key( ptime->refsys.instance );
+		}
+		DATE_NUMBERS * dn_1 = (DATE_NUMBERS *) palloc(sizeof(DATE_NUMBERS));
+		DATE_NUMBERS * dn_2 = (DATE_NUMBERS *) palloc(sizeof(DATE_NUMBERS));
+		DATE_NUMBERS * dn_3 = (DATE_NUMBERS *) palloc(sizeof(DATE_NUMBERS));
+		memset(dn_1, '\0', sizeof(DATE_NUMBERS));
+		memset(dn_2, '\0', sizeof(DATE_NUMBERS));
+		memset(dn_3, '\0', sizeof(DATE_NUMBERS));
+
+		*dn_1 = the_cal->jday_to_dnumbers( &ptime->data[0] );
+		*dn_2 = the_cal->jday_to_dnumbers( &ptime->data[1] );
+		*dn_3 = dn_minus_dn(dn_2,dn_1,the_cal);
+		dn_duration_to_string(dn_3, duration_out);
+
+		FREE_MEM(dn_1);
+		FREE_MEM(dn_2);
+		FREE_MEM(dn_3);
+	}
+	return err_ret;
+}
+
+
+
