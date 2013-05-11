@@ -156,6 +156,11 @@ CREATE OR REPLACE FUNCTION pt_overlaps(posttime ,posttime)
 	RETURNS boolean
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;   
+	
+CREATE OR REPLACE FUNCTION pt_weekday_int(posttime)
+	RETURNS integer
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;   	
 -------------------------------------------------------------------
 -- ISO19108 basic analysis for primitives
 

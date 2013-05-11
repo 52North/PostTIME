@@ -36,6 +36,7 @@ typedef enum pt_error_type {
 	ISO19108_NOT_FOR_ORDINAL_SYSTEMS,
 	CAN_ONLY_CAST_PTIME_INSTANTS,
 	CAN_ONLY_CAST_PERIOD_IF_SAME_DAY,
+	ONLY_INSTANTS_FUNCTIONS,
 } pt_error_type;
 
 typedef struct pt_error_msg {

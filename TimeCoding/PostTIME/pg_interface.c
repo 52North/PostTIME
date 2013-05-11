@@ -24,7 +24,7 @@ Datum tm_duration(PG_FUNCTION_ARGS);
 Datum tm_duration_dec_day(PG_FUNCTION_ARGS);
 Datum pt_simultaneous(PG_FUNCTION_ARGS);
 Datum pt_overlaps(PG_FUNCTION_ARGS);
-
+Datum pt_weekday_int(PG_FUNCTION_ARGS);
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
@@ -368,5 +368,23 @@ pt_overlaps(PG_FUNCTION_ARGS){
     PG_RETURN_BOOL( ret );
 }
 
+PG_FUNCTION_INFO_V1(pt_weekday_int);
+Datum
+pt_weekday_int(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+	int32 weekday;
+	pt_error_type ret_err = NO_ERROR;
+
+	if(ptime->type != 1) ret_err = ONLY_INSTANTS_FUNCTIONS;
+	else if(ptime->refsys.type == 3) ret_err = FUNCTION_UNDEFINED_FOR_ORDINAL;
+	if( ret_err != NO_ERROR ){
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
+	else weekday = ( (ptime->data[0] + MILLIS / 2) / (int64) MILLIS ) % 7;
+
+    PG_RETURN_INT32( weekday );
+}
 
 

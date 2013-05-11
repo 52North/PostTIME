@@ -145,6 +145,13 @@ Similar to simultaneous, but with the difference that it proofs if the two insta
     // result
     t
 
+##### pt\_weekday_int( PostTIME ) : integer 
+Determine the day of the week of the given instant. Result is an enumeration, beginning with 0 on Monday.
+
+    SELECT pt_weekday_int('2013-12-24T12');
+    // result
+    1
+
 ##### pt\_regular\_multi_to\_multi( PostTIME ) : PostTIME 
 This function transform's an RegularMultiObject into a normal MultiObject, what means you get concrete instants. *Examples:*
 

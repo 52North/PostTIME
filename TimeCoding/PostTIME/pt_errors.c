@@ -55,5 +55,7 @@ const pt_error_msg pt_error_msgs[] = {
 		"This cast is only defined for PostTIME instances."},
 		{CAN_ONLY_CAST_PERIOD_IF_SAME_DAY,
 		"Can only cast a period if the start instant and the end instant share the same day."},
+		{ONLY_INSTANTS_FUNCTIONS,
+		"This functions works only with instants."},
 };
 
