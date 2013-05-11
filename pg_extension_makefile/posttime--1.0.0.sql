@@ -150,7 +150,12 @@ CREATE OR REPLACE FUNCTION pt_regular_multi_to_multi(posttime)
 CREATE OR REPLACE FUNCTION pt_simultaneous(posttime ,posttime)
 	RETURNS boolean
 	AS '$libdir/posttime'
-	LANGUAGE 'c' IMMUTABLE STRICT;        
+	LANGUAGE 'c' IMMUTABLE STRICT;
+	
+CREATE OR REPLACE FUNCTION pt_overlaps(posttime ,posttime)
+	RETURNS boolean
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;   
 -------------------------------------------------------------------
 -- ISO19108 basic analysis for primitives
 

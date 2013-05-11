@@ -23,6 +23,8 @@ Datum tm_distance_dec_day(PG_FUNCTION_ARGS);
 Datum tm_duration(PG_FUNCTION_ARGS);
 Datum tm_duration_dec_day(PG_FUNCTION_ARGS);
 Datum pt_simultaneous(PG_FUNCTION_ARGS);
+Datum pt_overlaps(PG_FUNCTION_ARGS);
+
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
@@ -348,3 +350,23 @@ pt_simultaneous(PG_FUNCTION_ARGS){
 
     PG_RETURN_BOOL( ret );
 }
+
+PG_FUNCTION_INFO_V1(pt_overlaps);
+Datum
+pt_overlaps(PG_FUNCTION_ARGS){
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	bool ret = FALSE;
+	pt_error_type ret_err = NO_ERROR;
+	ret_err = overlaps( ptime_1 , ptime_2 , &ret );
+	if( ret_err != NO_ERROR ){
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
+
+    PG_RETURN_BOOL( ret );
+}
+
+
+

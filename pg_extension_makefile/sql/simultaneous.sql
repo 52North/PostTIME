@@ -53,6 +53,8 @@ VALUES
 ('TCS002123456/234567','TCS002123456,234567'),
 ('2013-2-2T12:30:40.123,2013-2-4T12:30:40.123,2015-2-2T12:30:40.123,2016-2-4T12:30:40.124,2017-2-2T12:30:40.123,2018-2-4T12:30:40.123,2019-2-2T12:30:40.123,2020-2-4T12:30:40.124,2021-2-2T12:30:40.123,2022-2-4T12:30:40.123,2023-2-2T12:30:40.123,2024-2-4T12:30:40.124,2013-2-2T12:30:40.123,2025-2-4T12:30:40.123,2026-2-2T12:30:40.123,2027-2-4T12:30:40.124','1997-4-12T14:23:42/2010-4-13T14:23:42');
 
-SELECT pt_simultaneous(posttime_1, posttime_2) FROM test4posttime_simultaneous;
+SELECT pt_simultaneous(posttime_1, posttime_2),posttime_1,posttime_2 FROM test4posttime_simultaneous;
+SELECT pt_overlaps(posttime_1, posttime_2),posttime_1,posttime_2 FROM test4posttime_simultaneous;
+
 
 SELECT pt_simultaneous('ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous','ORD001Ediacaran,Proterozoic');

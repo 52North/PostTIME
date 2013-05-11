@@ -134,6 +134,17 @@ Check out if two instances share at least one instant.
     // result
     t
 
+##### pt\_overlaps( PostTIME , PostTIME ) : PostTIME 
+Similar to simultaneous, but with the difference that it proofs if the two instances share at least one period in time.
+
+    SELECT pt_overlaps('2013-2-12/2013-2-28','2013-2-12T8');
+    // result
+    f
+
+    SELECT pt_overlaps('2013-2-12/2013-2-28','2013-2-12T8/2013-2-12T9');
+    // result
+    t
+
 ##### pt\_regular\_multi_to\_multi( PostTIME ) : PostTIME 
 This function transform's an RegularMultiObject into a normal MultiObject, what means you get concrete instants. *Examples:*
 

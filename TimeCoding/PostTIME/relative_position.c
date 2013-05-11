@@ -228,12 +228,71 @@ pt_error_type simultaneous(POSTTIME * ptime1 , POSTTIME * ptime2 , bool * is_sim
 			for( i = 0 ; i < count_1 ; i = i + 2 ){
 				for( j = 0 ; j < count_2 ; j = j + 2 ){
 					if( (ptime2_intern->data[j] <= ptime1_intern->data[i] && ptime2_intern->data[j+1] >= ptime1_intern->data[i]) ||
-							(ptime2_intern->data[j] <= ptime1_intern->data[i+1] && ptime2_intern->data[j+1] >= ptime1_intern->data[i+1]) ){
+							(ptime2_intern->data[j] <= ptime1_intern->data[i+1] && ptime2_intern->data[j+1] >= ptime1_intern->data[i]) ){
 						*is_simultaneous = TRUE;
 						break;
 					}
 				}
 				if(*is_simultaneous == TRUE) break;
+			}
+		}
+		if( ptime1->type > 4 ) { FREE_MEM(ptime1_intern); };
+		if( ptime2->type > 4 ) { FREE_MEM(ptime2_intern); };
+	}
+	return err_ret;
+}
+
+/*! Check if two instances share a simultaneous period.
+ * @param[in] ptime1
+ * @param[in] ptime2
+ * @param[out] overlaps
+ * \return Makes use of the pt_error_type. */
+pt_error_type overlaps(POSTTIME * ptime1 , POSTTIME * ptime2 , bool * overlaps){
+	*overlaps = FALSE;
+	pt_error_type err_ret = NO_ERROR;
+	int32 i = 0 , j = 0 , count_1 = 0 , count_2 = 0;
+	size_t size_needed = 0;
+	POSTTIME * ptime1_intern;
+	POSTTIME * ptime2_intern;
+
+	if( ptime1->refsys.type == 3 || ptime2->refsys.type == 3 ){
+		err_ret = FUNCTION_UNDEFINED_FOR_ORDINAL;
+	}
+	else {
+
+		/* RegularMultiObjects into MultiObjects */
+		if( ptime1->type > 4 ){
+			get_rvalue(ptime1 , &i );
+			size_needed = sizeof(POSTTIME) + ( sizeof(JULIAN_DAY) * (( i + 1 ) * ( ptime1->type - 4 ) - 1));
+			ptime1_intern = palloc( size_needed );
+			memset(ptime1_intern,'\0', size_needed );
+			regular_multi_to_multi( ptime1, ptime1_intern );
+			SET_VARSIZE( ptime1_intern, size_needed );
+		}
+		else ptime1_intern = ptime1;
+		if( ptime2->type > 4 ){
+			get_rvalue(ptime2 , &i );
+			size_needed = sizeof(POSTTIME) + ( sizeof(JULIAN_DAY) * (( i + 1 ) * ( ptime2->type - 4 ) - 1));
+			ptime2_intern = palloc( size_needed );
+			memset(ptime2_intern,'\0', size_needed );
+			regular_multi_to_multi( ptime2, ptime2_intern );
+			SET_VARSIZE( ptime2_intern, size_needed );
+		}
+		else ptime2_intern = ptime2;
+
+		count_1 = ( ( VARSIZE(ptime1) ) - sizeof(POSTTIME) )/sizeof(JULIAN_DAY) + 1;
+		count_2 = ( ( VARSIZE(ptime2) ) - sizeof(POSTTIME) )/sizeof(JULIAN_DAY) + 1;
+
+		if( (ptime1_intern->type == 4 || ptime1_intern->type == 2) && (ptime2_intern->type == 4 || ptime2_intern->type == 2) ){
+			for( i = 0 ; i < count_1 ; i = i + 2 ){
+				for( j = 0 ; j < count_2 ; j = j + 2 ){
+					if( (ptime2_intern->data[j] <= ptime1_intern->data[i] && ptime2_intern->data[j+1] > ptime1_intern->data[i]) ||
+							(ptime2_intern->data[j] < ptime1_intern->data[i+1] && ptime2_intern->data[j+1] >= ptime1_intern->data[i]) ){
+						*overlaps = TRUE;
+						break;
+					}
+				}
+				if(*overlaps == TRUE) break;
 			}
 		}
 		if( ptime1->type > 4 ) { FREE_MEM(ptime1_intern); };
