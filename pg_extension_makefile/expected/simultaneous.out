@@ -1,15 +1,16 @@
-CREATE TABLE test4posttime_distance
+CREATE TABLE test4posttime_simultaneous
 (
   id serial NOT NULL,
   posttime_1 posttime,
   posttime_2 posttime,
-  CONSTRAINT test4posttime_distance_pkey PRIMARY KEY (id)
+  CONSTRAINT test4posttime_simultaneous_pkey PRIMARY KEY (id)
 )
 WITH (
   OIDS=FALSE
 );
-
-INSERT INTO test4posttime_distance (posttime_1, posttime_2)
+NOTICE:  CREATE TABLE will create implicit sequence "test4posttime_simultaneous_id_seq" for serial column "test4posttime_simultaneous.id"
+NOTICE:  CREATE TABLE / PRIMARY KEY will create implicit index "test4posttime_simultaneous_pkey" for table "test4posttime_simultaneous"
+INSERT INTO test4posttime_simultaneous (posttime_1, posttime_2)
 VALUES 
 ('2010-4-12T14:23:42','2010-4-12T14:23:42'),
 ('2010-5-12T14:23:42','2010-4-12T14:23:42'),
@@ -47,12 +48,56 @@ VALUES
 ('TCS0012111222.345678','TCS0012111223.345678'),
 ('2010-4-12T14:23:42,2010-4-12T14:23:42','2012'),
 ('2010-5-12T14:23:42','2010-4-12T14:23:42,2011,2013,2015'),
-('2010-3-12T14:23:42/2013,2017/2019','2010-4-12T14:23:42');
+('2010-3-12T14:23:42/2013,2017/2019','2010-4-12T14:23:42'),
+('2013-2-2T12:30:40.123,2013-2-4T12:30:40.123,2015-2-2T12:30:40.123,2016-2-4T12:30:40.124','R23/2014-2-3/P1D'),
+('R21/2014-2-3/P1D/P2D','R86/2014-2-3/P1DT2.123S'),
+('TCS002123456/234567','TCS002123456,234567'),
+('2013-2-2T12:30:40.123,2013-2-4T12:30:40.123,2015-2-2T12:30:40.123,2016-2-4T12:30:40.124,2017-2-2T12:30:40.123,2018-2-4T12:30:40.123,2019-2-2T12:30:40.123,2020-2-4T12:30:40.124,2021-2-2T12:30:40.123,2022-2-4T12:30:40.123,2023-2-2T12:30:40.123,2024-2-4T12:30:40.124,2013-2-2T12:30:40.123,2025-2-4T12:30:40.123,2026-2-2T12:30:40.123,2027-2-4T12:30:40.124','1997-4-12T14:23:42/2010-4-13T14:23:42');
+SELECT pt_simultaneous(posttime_1, posttime_2) FROM test4posttime_simultaneous;
+ pt_simultaneous 
+-----------------
+ t
+ f
+ f
+ f
+ t
+ t
+ t
+ f
+ f
+ t
+ t
+ t
+ f
+ f
+ t
+ t
+ t
+ t
+ t
+ f
+ t
+ t
+ t
+ t
+ t
+ f
+ f
+ t
+ t
+ f
+ f
+ f
+ f
+ f
+ f
+ f
+ t
+ f
+ t
+ t
+ f
+(41 rows)
 
-SELECT tm_distance(posttime_1, posttime_2) FROM test4posttime_distance;
-
-SELECT tm_distance_dec_day(posttime_1, posttime_2) FROM test4posttime_distance;
-
-SELECT tm_duration(posttime_1) FROM test4posttime_distance;
-
-SELECT tm_duration_dec_day(posttime_1) FROM test4posttime_distance;
+SELECT pt_simultaneous('ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous','ORD001Ediacaran,Proterozoic');
+ERROR:  This function does not work with Ordinal Systems
