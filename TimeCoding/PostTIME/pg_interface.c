@@ -337,12 +337,9 @@ Datum
 pt_simultaneous(PG_FUNCTION_ARGS){
 	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
-
 	bool ret = FALSE;
-
 	pt_error_type ret_err = NO_ERROR;
 	ret_err = simultaneous( ptime_1 , ptime_2 , &ret );
-
 	if( ret_err != NO_ERROR ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				errmsg("%s",pt_error_msgs[ret_err].msg)));

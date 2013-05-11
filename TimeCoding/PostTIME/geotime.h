@@ -6,13 +6,14 @@
 #include "postgres.h"
 #include "fmgr.h"
 #include "pt_errors.h"
+#include "utils/timestamp.h"
+#include "utils/date.h"
 
 #ifndef GEOTIME_H_
 #define GEOTIME_H_
 
 /* Less code macros */
 #define FREE_MEM(p)   do { pfree(p); (p) = NULL; } while(0);
-
 #define MILLIS 86400000
 /* Syntax defining macros */
 #define PRIMITIVE_SEPARATOR ','

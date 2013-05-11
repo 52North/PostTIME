@@ -1,0 +1,74 @@
+SELECT (('2013-5-11')::timestamp without time zone)::posttime;
+            posttime            
+--------------------------------
+ CAL0012013-05-11T00:00:00.000Z
+(1 row)
+
+SELECT (('2013-5-11 00:00:00z')::timestamp with time zone)::posttime;
+            posttime            
+--------------------------------
+ CAL0012013-05-11T00:00:00.000Z
+(1 row)
+
+SELECT (('2013-5-11 12:20')::timestamp without time zone)::posttime;
+            posttime            
+--------------------------------
+ CAL0012013-05-11T12:20:00.000Z
+(1 row)
+
+SELECT (('2013-5-11T12')::posttime)::timestamp without time zone;
+        timestamp         
+--------------------------
+ Sat May 11 12:00:00 2013
+(1 row)
+
+SELECT (('2013-5-11T12')::posttime)::timestamp with time zone;
+         timestamptz          
+------------------------------
+ Sat May 11 05:00:00 2013 PDT
+(1 row)
+
+SELECT (('2013-5-11')::date)::posttime;
+                        posttime                         
+---------------------------------------------------------
+ CAL0012013-05-11T00:00:00.000Z/2013-05-12T00:00:00.000Z
+(1 row)
+
+SELECT (('2013-7-11')::date)::posttime;
+                        posttime                         
+---------------------------------------------------------
+ CAL0012013-07-11T00:00:00.000Z/2013-07-12T00:00:00.000Z
+(1 row)
+
+SELECT (('2013-5-11T12:30')::posttime)::date;
+    date    
+------------
+ 05-11-2013
+(1 row)
+
+SELECT (('2013-7-11T12')::posttime)::date;
+    date    
+------------
+ 07-11-2013
+(1 row)
+
+SELECT (('2013-7-11')::posttime)::date;
+    date    
+------------
+ 07-11-2013
+(1 row)
+
+SELECT (('2013-7-11T00:00:00/2013-7-12T00:00:00')::posttime)::date;
+    date    
+------------
+ 07-11-2013
+(1 row)
+
+SELECT (('2013-7-11T00:00:00/2013-7-12T00:00:00.001')::posttime)::date;
+ERROR:  Can only cast a period if the start instant and the end instant share the same day.
+SELECT (('2013-7')::posttime)::date;
+ERROR:  Can only cast a period if the start instant and the end instant share the same day.
+SELECT (('2013-5-11')::posttime)::timestamp without time zone;
+ERROR:  This cast is only defined for PostTIME instances.
+SELECT (('ORD001Triassic')::posttime)::timestamp with time zone;
+ERROR:  This function does not work with Ordinal Systems

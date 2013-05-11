@@ -153,5 +153,12 @@ This function transform's an RegularMultiObject into a normal MultiObject, what 
     // result
     'TCS00221224211.000000,210891107532.000000,421760990853.000000'
 
-##Doxygen source code documentation
+##Casts
+The PostTIME extension includes casts to and from _date_, _timestamp with time zone_, and _timestamp without time zone_.
+
+A cast from a timestamp will produce an instant in any case and you can only cast into timestamps with instants. A cast to _timestamp with time zone_ will convert the PostTIME instance into your time zone, according to the PostgreSQL settings.
+
+On the contrary casts into _date_ are also possible with periods, on the condition that the period's start and end instants have to belong to the same day. If you cast _date_ to PostTIME you get a period, representing the whole day.
+
+#Doxygen source code documentation
 Follow [link](http://141.30.100.164:8080) to the doxygen documentation files of the source code.

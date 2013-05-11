@@ -51,5 +51,9 @@ const pt_error_msg pt_error_msgs[] = {
 		"This function is taken over from ISO19108 and only for the primitive object types defined."},
 		{ISO19108_NOT_FOR_ORDINAL_SYSTEMS,
 		"This function can not be used with an ordinal system."},
+		{CAN_ONLY_CAST_PTIME_INSTANTS,
+		"This cast is only defined for PostTIME instances."},
+		{CAN_ONLY_CAST_PERIOD_IF_SAME_DAY,
+		"Can only cast a period if the start instant and the end instant share the same day."},
 };
 

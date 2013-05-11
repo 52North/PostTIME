@@ -44,8 +44,11 @@ CREATE TYPE posttime (
 );
 
 -------------------------------------------------------------------
--- ASSIGNMENT CAST FROM TEXT
+-- CASTS
 -------------------------------------------------------------------
+
+-------------------------------------------------------------------
+-- Assignment cast from text
 
 CREATE OR REPLACE FUNCTION posttime_in(text)
         RETURNS posttime
@@ -55,6 +58,59 @@ CREATE OR REPLACE FUNCTION posttime_in(text)
 CREATE CAST (text AS posttime)
         WITH FUNCTION posttime_in(text)
         AS ASSIGNMENT;
+
+-------------------------------------------------------------------
+-- Casts from and to PostgreSQL's basic date types.
+
+-- timestamp
+CREATE OR REPLACE FUNCTION posttime(timestamp with time zone)
+RETURNS posttime
+AS '$libdir/posttime', 'pt_cast_from_timestamp'
+LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (timestamp with time zone AS posttime)
+    WITH FUNCTION posttime(timestamp with time zone);
+    
+CREATE OR REPLACE FUNCTION posttime(timestamp without time zone)
+RETURNS posttime
+AS '$libdir/posttime', 'pt_cast_from_timestamp'
+LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (timestamp without time zone AS posttime)
+    WITH FUNCTION posttime(timestamp without time zone);
+    
+CREATE OR REPLACE FUNCTION timestamp_without_time_zone(posttime)
+RETURNS timestamp without time zone
+AS '$libdir/posttime', 'pt_cast_to_timestamp'
+LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (posttime AS timestamp without time zone )
+    WITH FUNCTION timestamp_without_time_zone(posttime);
+    
+CREATE OR REPLACE FUNCTION timestamp_with_time_zone(posttime)
+RETURNS timestamp with time zone
+AS '$libdir/posttime', 'pt_cast_to_timestamp'
+LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (posttime AS timestamp with time zone)
+    WITH FUNCTION timestamp_with_time_zone(posttime);
+
+-- date
+CREATE OR REPLACE FUNCTION posttime(date)
+RETURNS posttime
+AS '$libdir/posttime', 'pt_cast_from_date'
+LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (date AS posttime)
+    WITH FUNCTION posttime(date);
+    
+CREATE OR REPLACE FUNCTION date(posttime)
+RETURNS date
+AS '$libdir/posttime', 'pt_cast_to_date'
+LANGUAGE 'C' IMMUTABLE STRICT;
+
+CREATE CAST (posttime AS date)
+    WITH FUNCTION date(posttime);
 
 -------------------------------------------------------------------
 -- BASIC DATA PROCESSING FUNCTIONALITY
@@ -79,7 +135,8 @@ CREATE AGGREGATE pt_temporal_bbox (posttime) (
 	FINALFUNC = pt_temporal_bbox_instance
 );
 -------------------------------------------------------------------
-	
+-- more basic stuff
+
 CREATE OR REPLACE FUNCTION pt_transform_system(posttime, cstring)
 	RETURNS posttime
 	AS '$libdir/posttime'
