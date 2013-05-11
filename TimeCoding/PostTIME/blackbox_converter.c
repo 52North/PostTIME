@@ -92,7 +92,7 @@ BYTE parse_single_float(char * str_in, float8 * float_number){
 /*!Parse a string which is representing a single instant into a DATE_NUMBERS struct.
  * @param[in] str_in The string which is representing the instant.
  * @param[out] dn_ret The extracted values in a DATE_NUMBERS struct.
- * \return 0 in case of error, otherwise 1 */
+ * \return makes use of the pt_error_type */
 pt_error_type parse_single_instant_string(char * str_in, DATE_NUMBERS * dn_ret){
 
 	char * str_arr[6] = { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 };
@@ -154,6 +154,10 @@ pt_error_type parse_single_instant_string(char * str_in, DATE_NUMBERS * dn_ret){
 	return ret_err;
 }
 
+/*!Parse a string which is representing a ISO8601-duration into a DATE_NUMBERS struct.
+ * @param[in] str_in The ISO8601-duration-string.
+ * @param[out] dn The extracted values in a DATE_NUMBERS struct.
+ * \return makes use of the pt_error_type */
 pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
 	pt_error_type err_ret = NO_ERROR;
 	const char calendar_value_identifier[] = {'Y','M','D'};
@@ -222,19 +226,22 @@ pt_error_type parse_single_duration_string(char * str_in, DATE_NUMBERS * dn){
 	return err_ret;
 }
 
+/*!This produces the end instant for a perid with the given start instant with the given granularity.
+ * @param[inout] dn_in_out Input and output via this struct.
+ * @param[in] cal Use this calendar's rules for calculations. */
 void adjust_dn_to_granularity( DATE_NUMBERS * dn_in_out , calendar_era * cal ){
 	switch(dn_in_out->granularity){
 	case YEAR:
 		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_year , cal );
-		*dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
+		// *dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
 		break;
 	case MONTH:
 		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_mon , cal );
-		*dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
+		// *dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
 		break;
 	case DAY:
 		*dn_in_out = dn_plus_dn( dn_in_out , &dn_duration_day , cal );
-		*dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
+		// *dn_in_out = dn_minus_period( dn_in_out , &dn_duration_msec , cal );
 		break;
 	default:
 		break;
@@ -395,6 +402,10 @@ pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptim
 	return ret_err;
 }
 
+/*!This transforms a DATE_NUMBERS struct, which is representing a period, in an integer array for storage.
+ * @param[in] period_vals The period.
+ * @param[in] rvalue Number of recurrences, 0 if unterminated.
+ * @param[out] jd_ptr Put it in this JULIAN_DAY. */
 void dn_period_to_jday_pack(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , int32 rvalue){
 	int32 int32_array[6] = { rvalue,
 			period_vals->yea,
@@ -406,6 +417,10 @@ void dn_period_to_jday_pack(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , i
 	*(jd_ptr + 3) = (int64) (period_vals->sec * MILLIS);
 }
 
+/*!This is just inverse to dn_period_to_jday_pack.
+ * @param[in] period_vals The period.
+ * @param[in] rvalue Number of recurrences, 0 if unterminated.
+ * @param[out] jd_ptr Pull it from this JULIAN_DAY. */
 void jday_pack_to_dn_period(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , int32 * rvalue){
 	int32 int32_array[6] = { 0,0,0,0,0,0 };
 	memcpy( int32_array , jd_ptr , sizeof(JULIAN_DAY) * 3 );
@@ -418,7 +433,11 @@ void jday_pack_to_dn_period(DATE_NUMBERS * period_vals , JULIAN_DAY * jd_ptr , i
 	period_vals->min = int32_array[5];
 }
 
-// TODO comment
+/*!Convert a regular object from string representation into the POSTTIME struct.
+ * @param[out] ptime_tmp The result.
+ * @param[in] str_primitives Start instant.
+ * @param[in] str_reg_parts One or two P-strings.
+ * \return Makes use of the pt_error_type. */
 pt_error_type regular_strings_to_ptime_instance(POSTTIME * ptime_tmp, char ** str_primitives, char * * str_reg_parts){
 	pt_error_type err_ret = NO_ERROR;
 	int32 int_r_value;

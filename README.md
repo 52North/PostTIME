@@ -122,6 +122,18 @@ Transforms a PostTIME instance into the reference system specified by the given 
     // result
     'TCS0012456413.013889'
 
+
+##### pt\_simultaneous( PostTIME , PostTIME ) : PostTIME 
+Check out if two instances share at least one instant.
+
+    SELECT pt_simultaneous('2013-5-4T8:2','R10/2013-5-3/PT8H/PT16H');
+    // result
+    f
+
+    SELECT pt_simultaneous('2013-5-4T8','R10/2013-5-3/PT8H/PT16H');
+    // result
+    t
+
 ##### pt\_regular\_multi_to\_multi( PostTIME ) : PostTIME 
 This function transform's an RegularMultiObject into a normal MultiObject, what means you get concrete instants. *Examples:*
 

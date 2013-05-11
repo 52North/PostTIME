@@ -11,6 +11,9 @@
 
 const char * refsys_types[NUMBER_REFSYS_TYPES] = { CALENDAR_FLAG, TEMPORAL_COORDINATE_FLAG, ORDINAL_FLAG };
 
+/*! Convert an RegularMulti into a 'norma' Multi object.
+ * @param[in] ptime_reg The regular POSTTIME.
+ * @param[out] ptime_multi The resulting MultiInstant or MultiPeriod. */
 void regular_multi_to_multi( POSTTIME * ptime_reg , POSTTIME * ptime_multi ){
 	DATE_NUMBERS dn_0 , dn_valid, dn_invalid, dn_result;
 	int32 rvalue = 0 , i = 0, dummy = 0;
@@ -75,6 +78,10 @@ void regular_multi_to_multi( POSTTIME * ptime_reg , POSTTIME * ptime_multi ){
 	}
 }
 
+/*!Get the number of recurrences from a RegularMultiObject.
+ * @param[in] ptime_reg
+ * @param[out] rvalue
+ * \return Makes use of the pt_error_type. */
 pt_error_type get_rvalue(POSTTIME * ptime_reg, int32 * rvalue){
 	pt_error_type ret_err = NO_ERROR;
 	if(ptime_reg->type < 5){

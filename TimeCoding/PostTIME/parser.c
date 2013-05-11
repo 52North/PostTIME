@@ -124,6 +124,11 @@ pt_error_type determine_refsys(char * str_in, char *strs_out[], POSTTIME * ptime
 	return err_ret;
 }
 
+/*!First examination if a given string could represent a regular multi object.
+ * @param[in] ptime_tmp Store type information in this POSTTIME.
+ * @param[in] str_primitives The given string.
+ * @param[out] str_reg_parts Save important positions for deeper analysis.
+ * \return Makes use of the pt_error_type. */
 pt_error_type string_is_regular(POSTTIME * ptime_tmp, char * * str_primitives, char * * str_reg_parts){
 	char * buf = 0;
 	BYTE type = 0;

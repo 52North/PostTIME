@@ -1,6 +1,7 @@
 
 #include "distance_length.h"
 
+/*!ISO19108 primitive function. tm_distance */
 pt_error_type distance_jul_day(POSTTIME * ptime1, POSTTIME * ptime2, float8 * jul_day_out){
 	int32 relative_pos = 0;
 	pt_error_type err_ret= NO_ERROR;
@@ -38,6 +39,7 @@ pt_error_type distance_jul_day(POSTTIME * ptime1, POSTTIME * ptime2, float8 * ju
 	return err_ret;
 }
 
+/*!ISO19108 primitive function. tm_distance */
 pt_error_type distance_string(POSTTIME * ptime1, POSTTIME * ptime2, char * distance_out){
 	pt_error_type err_ret = NO_ERROR;
 	int32 relative_pos = 0;
@@ -105,6 +107,7 @@ pt_error_type distance_string(POSTTIME * ptime1, POSTTIME * ptime2, char * dista
 	return err_ret;
 }
 
+/*!ISO19108 primitive function. tm_distance */
 pt_error_type duration_jul_day( POSTTIME * ptime , float8 * jul_day_out){
 	pt_error_type err_ret = NO_ERROR;
 
@@ -120,6 +123,7 @@ pt_error_type duration_jul_day( POSTTIME * ptime , float8 * jul_day_out){
 	return err_ret;
 }
 
+/*!ISO19108 primitive function. tm_distance */
 pt_error_type duration_string(POSTTIME * ptime, char * duration_out){
 	pt_error_type err_ret = NO_ERROR;
 	int32 relative_pos = 0;

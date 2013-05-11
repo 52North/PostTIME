@@ -115,7 +115,7 @@ DATE_NUMBERS dn_plus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_add, calendar_er
 /*!This function subtracts a period from a calendar date - the result is determined according to the rules of
  * the given calendar_era.
  * @param[in] dn_in Given calendar date.
- * @param[in] dn_minus The period - also as DATE_NUMBERS.
+ * @param[in] period_minus The period - also as DATE_NUMBERS.
  * @param[in] cal Process according to this system.
  * \return The result as DATE_NUMBERS. */
 DATE_NUMBERS dn_minus_period(DATE_NUMBERS * dn_in, DATE_NUMBERS * period_minus, calendar_era * cal){
@@ -172,6 +172,12 @@ DATE_NUMBERS dn_minus_period(DATE_NUMBERS * dn_in, DATE_NUMBERS * period_minus, 
 	return ret_dn;
 }
 
+/*!This function subtracts a calendar date from anther calendar date - the result is determined according to the rules of
+ * the given calendar_era.
+ * @param[in] dn_later Has to be later than dn_earlier.
+ * @param[in] dn_earlier Has to be earlier than dn_later.
+ * @param[in] cal Process according to this system.
+ * \return The result as DATE_NUMBERS. */
 DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_later, DATE_NUMBERS * dn_earlier, calendar_era * cal){
 	DATE_NUMBERS ret_dn, dn_minus_intern;
 	BYTE is_leap;
