@@ -2,13 +2,13 @@
 The PostTIME project intends to enhance PostgreSQL's capabilities to handle the temporal dimension with a focus on processing spatial information. For that purpose it provides:
 
 1. *__6__ different __object types__ to abstract time*
-* Instants and periods of time
-* MultiInstants and MultiPeriods (composition types)
-* RegularMultiInstant and RegularMultiPeriod (to model regular repeating events)
+    * Instants and periods of time
+    * MultiInstants and MultiPeriods (composition types)
+    * RegularMultiInstant and RegularMultiPeriod (to model regular repeating events)
 2. *Various __temporal reference systems__ of __3__ different general types*
-* Temporal coordinate systems e.g. UNIX-Time
-* Calendar and clock systems like the Gregorian calendar with UTC
-* Ordinal systems e.g. the geological eras.
+    * Temporal coordinate systems e.g. UNIX-Time
+    * Calendar and clock systems like the Gregorian calendar with UTC
+    * Ordinal systems e.g. the geological eras.
 3. *Several __SQL functions__ for your __analysis__ tasks* - please see [below](https:--github.com/52North/PostTIME#posttime-sql-functions) for more information about this.
 
 The concept is basing on ISO19108. The project is in an __early stage__, so please keep in mind that PostTIME is more or less unstable and anything but complete.
