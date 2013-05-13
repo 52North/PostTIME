@@ -12,6 +12,8 @@
 #ifndef GEOTIME_H_
 #define GEOTIME_H_
 
+#define POSTGIS_SHLIB_NAME "postgis-2.0.so"
+
 /* Less code macros */
 #define FREE_MEM(p)   do { pfree(p); (p) = NULL; } while(0);
 #define MILLIS 86400000

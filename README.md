@@ -13,6 +13,27 @@ The PostTIME project intends to enhance PostgreSQL's capabilities to handle the 
 
 The concept is basing on ISO19108. The project is in an __early stage__, so please keep in mind that PostTIME is more or less unstable and anything but complete.
 
+For example PostTIME allows to extract the successor relationships from the [Cshape](http://nils.weidmann.ws/projects/cshapes) Dataset, which contains several countries as dynamic features, by the following SQL-Statement on the condition that the object's validtime is stored as PostTIME:
+
+```sql
+SELECT a.cntry_name , b.cntry_name AS predecessor
+FROM testdata_cshape AS a
+	INNER JOIN testdata_cshape AS b
+	ON successor(a.the_geom , a.validtime , b.the_geom, b.validtime);
+```
+
+The result includes among other things:
+
+              cntry_name          |          successor           
+    ------------------------------+------------------------------
+     ...
+     Germany Federal Republic     | Germany
+     Germany Democratic Republic  | Germany 
+     ...
+
+
+Cshape: _Weidmann, Nils B., Doreen Kuse, and Kristian Skrede Gleditsch. 2010. The Geography of the International System: The CShapes Dataset. International Interactions 36 (1)._
+
 #Install instructions - Set up as PostgreSQL extension
 PostTIME makes use of the PostgreSQL extension feature so you need PostgreSQL version 9.1 or higher. For more information see the [PostgreSQL documentation](http://www.postgresql.org/docs/ "www.postgresql.org/docs/").
 

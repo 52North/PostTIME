@@ -3,7 +3,7 @@
  *      Author: ptr
  */
 
-#include "pg_interface_casts.h"
+#include "geotime.h"
 
 Datum pt_cast_from_timestamp(PG_FUNCTION_ARGS);
 Datum pt_cast_to_timestamp(PG_FUNCTION_ARGS);

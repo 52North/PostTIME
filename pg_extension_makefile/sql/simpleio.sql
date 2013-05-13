@@ -1,3 +1,5 @@
+CREATE EXTENSION postgis;
+
 CREATE EXTENSION posttime;
 
 CREATE TABLE pt_simpleio_table (id serial, ptime posttime);
@@ -56,7 +58,9 @@ VALUES
 ('ORD001Ediacaran,Proterozoic'),
 ('ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous'),
 ('-232'),
-('-4713');
+('-4713'),
+('2013-2-2T12:30:40.123Z'),
+('2013-2-2T12:30:40.123Z/2013-2-4T12:30:40.123Z');
 
 SELECT * FROM pt_simpleio_table;
 

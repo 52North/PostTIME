@@ -1,3 +1,4 @@
+CREATE EXTENSION postgis;
 CREATE EXTENSION posttime;
 CREATE TABLE pt_simpleio_table (id serial, ptime posttime);
 INSERT INTO pt_simpleio_table( ptime )
@@ -54,7 +55,9 @@ VALUES
 ('ORD001Ediacaran,Proterozoic'),
 ('ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous'),
 ('-232'),
-('-4713');
+('-4713'),
+('2013-2-2T12:30:40.123Z'),
+('2013-2-2T12:30:40.123Z/2013-2-4T12:30:40.123Z');
 SELECT * FROM pt_simpleio_table;
  id |                                                                                                                                                                                                         ptime                                                                                                                                                                                                         
 ----+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -104,7 +107,9 @@ SELECT * FROM pt_simpleio_table;
  44 | ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous
  45 | CAL001-232-01-01T00:00:00.000Z/-231-01-01T00:00:00.000Z
  46 | CAL001-4713-01-01T00:00:00.000Z/-4712-01-01T00:00:00.000Z
-(46 rows)
+ 47 | CAL0012013-02-02T12:30:40.123Z
+ 48 | CAL0012013-02-02T12:30:40.123Z/2013-02-04T12:30:40.123Z
+(48 rows)
 
 /* * * error * * */
 SELECT ('-4714')::posttime;

@@ -50,13 +50,13 @@ CREATE TYPE posttime (
 -------------------------------------------------------------------
 -- Assignment cast from text
 
-CREATE OR REPLACE FUNCTION posttime_in(text)
+CREATE OR REPLACE FUNCTION posttime(text)
         RETURNS posttime
-        AS '$libdir/posttime'
+        AS '$libdir/posttime','posttime_in'
         LANGUAGE 'c' IMMUTABLE STRICT;
 
 CREATE CAST (text AS posttime)
-        WITH FUNCTION posttime_in(text)
+        WITH FUNCTION posttime(text)
         AS ASSIGNMENT;
 
 -------------------------------------------------------------------
@@ -193,3 +193,18 @@ CREATE OR REPLACE FUNCTION tm_duration_dec_day(posttime)
 	RETURNS double precision
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
+
+-------------------------------------------------------------------
+-- POSTGIS DEPENDENCIES
+-------------------------------------------------------------------  
+	
+CREATE OR REPLACE FUNCTION successor(geometry, posttime, geometry, posttime)
+	RETURNS boolean
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+	
+CREATE OR REPLACE FUNCTION predecessor(geometry, posttime, geometry, posttime)
+	RETURNS boolean
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;
+	

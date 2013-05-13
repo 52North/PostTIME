@@ -6,3 +6,5 @@ pg_extension_makefile/logTest4PostTIME.log
 pg_extension_makefile/simpleQuerysSQL.txt
 pg_extension_makefile/test4ptime.jar
 pg_extension_makefile/test_script_make
+pg_extension_makefile/sql/cshape*
+pg_extension_makefile/expected/cshape*

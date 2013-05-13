@@ -129,6 +129,13 @@ pt_error_type parse_single_instant_string(char * str_in, DATE_NUMBERS * dn_ret){
     	}
 	}
 
+	if( dn_ret->granularity > DAY ){
+		int32 str_len = strlen(str_arr[dn_ret->granularity]);
+		if( str_arr[dn_ret->granularity][str_len - 1] == 'Z' && str_len > 1 ){
+			str_arr[dn_ret->granularity][str_len - 1] = '\0';
+		}
+	}
+
 	// Handle seconds as floating point if found.
 	if( dn_ret->granularity == SECOND ){
 		i--;

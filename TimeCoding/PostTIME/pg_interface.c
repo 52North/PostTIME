@@ -387,4 +387,3 @@ pt_weekday_int(PG_FUNCTION_ARGS){
     PG_RETURN_INT32( weekday );
 }
 
-
