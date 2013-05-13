@@ -246,7 +246,7 @@ SELECT pt_predecessor(
  f
 ```
 
-The antagonist function __pt\_successor( geometry, PostTIME, geometry, PostTIME ) : boolean__ is instead true if the relative position is _MetBy_.
+The antagonist function __pt\_predecessor( geometry, PostTIME, geometry, PostTIME ) : boolean__ is instead true if the relative position is _MetBy_.
 
 #Doxygen source code documentation
 Follow [link](http:--141.30.100.164:8080) to the doxygen documentation files of the source code.
