@@ -1,35 +1,35 @@
-SELECT predecessor( 
+SELECT pt_predecessor( 
+'POLYGON((1 1,1 4,4 4,4 1,1 1))',
+'2012',
+'POLYGON((1 1,1 2,2 2,2 1,1 1))',
+'2013');
+
+SELECT pt_predecessor( 
+'POLYGON((1 1,1 4,4 4,4 1,1 1))',
+'2013',
+'POLYGON((1 1,1 2,2 2,2 1,1 1))',
+'2012');
+
+SELECT pt_predecessor( 
 'POLYGON((1 1,1 20,20 20,20 1,1 1))',
-posttime_in('2011/2014'),
+'2012/2014',
+'POLYGON((1 1,5 10,20 20,20 1,1 1))',
+'2015/2016');
+
+SELECT pt_successor( 
+'POLYGON((1 1,1 20,20 20,20 1,1 1))',
+'2011/2014',
 'POLYGON((3 3,0 10,10 10,10 3,3 3))',
-posttime_in('2015/2016'));
+'2008/2010');
 
-SELECT predecessor( 
+SELECT pt_successor( 
 'POLYGON((1 1,1 20,20 20,20 1,1 1))',
-posttime_in('2013/2014'),
+'2013/2014',
 'POLYGON((1 1,5 10,20 20,20 1,1 1))',
-posttime_in('2010/2012'));
+'2010/2012');
 
-SELECT predecessor( 
+SELECT pt_successor( 
 'POLYGON((1 1,1 20,20 20,20 1,1 1))',
-posttime_in('2012/2014'),
+'2012/2014',
 'POLYGON((1 1,5 10,20 20,20 1,1 1))',
-posttime_in('2015/2016'));
-
-SELECT successor( 
-'POLYGON((1 1,1 20,20 20,20 1,1 1))',
-posttime_in('2011/2014'),
-'POLYGON((3 3,0 10,10 10,10 3,3 3))',
-posttime_in('2008/2010'));
-
-SELECT successor( 
-'POLYGON((1 1,1 20,20 20,20 1,1 1))',
-posttime_in('2013/2014'),
-'POLYGON((1 1,5 10,20 20,20 1,1 1))',
-posttime_in('2010/2012'));
-
-SELECT successor( 
-'POLYGON((1 1,1 20,20 20,20 1,1 1))',
-posttime_in('2012/2014'),
-'POLYGON((1 1,5 10,20 20,20 1,1 1))',
-posttime_in('2015/2016'));
+'2015/2016');

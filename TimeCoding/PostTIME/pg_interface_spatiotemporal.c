@@ -6,12 +6,12 @@
 
 #include "relative_position.h"
 
-Datum predecessor(PG_FUNCTION_ARGS);
-Datum successor(PG_FUNCTION_ARGS);
+Datum pt_predecessor(PG_FUNCTION_ARGS);
+Datum pt_successor(PG_FUNCTION_ARGS);
 
-PG_FUNCTION_INFO_V1(predecessor);
+PG_FUNCTION_INFO_V1(pt_predecessor);
 Datum
-predecessor(PG_FUNCTION_ARGS){
+pt_predecessor(PG_FUNCTION_ARGS){
 	Datum geom_1 = PG_GETARG_DATUM(0);
 	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(1);
 	Datum geom_2 = PG_GETARG_DATUM(2);
@@ -46,9 +46,9 @@ predecessor(PG_FUNCTION_ARGS){
 	PG_RETURN_BOOL(ptime_ret);
 }
 
-PG_FUNCTION_INFO_V1(successor);
+PG_FUNCTION_INFO_V1(pt_successor);
 Datum
-successor(PG_FUNCTION_ARGS){
+pt_successor(PG_FUNCTION_ARGS){
 	Datum geom_1 = PG_GETARG_DATUM(0);
 	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(1);
 	Datum geom_2 = PG_GETARG_DATUM(2);

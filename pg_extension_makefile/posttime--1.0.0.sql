@@ -198,12 +198,12 @@ CREATE OR REPLACE FUNCTION tm_duration_dec_day(posttime)
 -- POSTGIS DEPENDENCIES
 -------------------------------------------------------------------  
 	
-CREATE OR REPLACE FUNCTION successor(geometry, posttime, geometry, posttime)
+CREATE OR REPLACE FUNCTION pt_successor(geometry, posttime, geometry, posttime)
 	RETURNS boolean
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
 	
-CREATE OR REPLACE FUNCTION predecessor(geometry, posttime, geometry, posttime)
+CREATE OR REPLACE FUNCTION pt_predecessor(geometry, posttime, geometry, posttime)
 	RETURNS boolean
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
