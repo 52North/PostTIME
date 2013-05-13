@@ -22,7 +22,7 @@ FROM testdata_cshape AS a
 	ON pt_successor(a.the_geom , a.validtime , b.the_geom, b.validtime);
 ```
 
-The result includes among other things:
+The result includes among other rows:
   
 ```psql
   cntry_name  |  successor   
@@ -225,8 +225,8 @@ On the contrary casts into _date_ are also possible with periods, on the conditi
 ##Spatio-temporal Functions
 In general, this functions combine the Basic functions with functions from the PostGIS extension to allow spatio-temporal analysis.
 
-##### pt\_successor( geometry, PostTIME, geometry, PostTIME ) : boolean
-This function returns true if the two geometries' interior intersects and the [relative position](https://github.com/52North/PostTIME#tm_relative_position-posttime--posttime---text)  from the first PostTIME argument to the second is _Meets_. *Examples:*
+##### pt\_predecessor( geometry, PostTIME, geometry, PostTIME ) : boolean
+This function returns true if the two geometries' interior intersects and the [relative position](https://github.com/52North/PostTIME#tm_relative_position-posttime--posttime---text)  from the first PostTIME argument to the second is _MetBy_. In other words it returns true if the second geometry-posttime tuple represents an object that is a predecessor of the object represented by the first tuple. *Examples:*
 
 ```mysql
 SELECT pt_predecessor( 
@@ -246,7 +246,7 @@ SELECT pt_predecessor(
  f
 ```
 
-The antagonist function __pt\_predecessor( geometry, PostTIME, geometry, PostTIME ) : boolean__ is instead true if the relative position is _MetBy_.
+The antagonist function __pt\_successor( geometry, PostTIME, geometry, PostTIME ) : boolean__ is instead true if the relative position is _Meets_.
 
 #Doxygen source code documentation
 Follow [link](http:--141.30.100.164:8080) to the doxygen documentation files of the source code.
