@@ -13,13 +13,13 @@ The PostTIME project intends to enhance PostgreSQL's capabilities to handle the 
 
 The concept is basing on ISO19108. The project is in an __early stage__, so please keep in mind that PostTIME is more or less unstable and anything but complete.
 
-For example PostTIME allows to extract the successor relationships from the [Cshape](http://nils.weidmann.ws/projects/cshapes) Dataset, which contains several countries as dynamic features, by the following SQL-Statement on the condition that the object's validtime is stored as PostTIME:
+For example PostTIME allows to extract the predecessor-relationships from the [Cshape](http://nils.weidmann.ws/projects/cshapes) Dataset, which contains several countries as dynamic features, by the following SQL-Statement on the condition that the object's validtime is stored as PostTIME:
 
 ```mysql
 SELECT a.cntry_name , b.cntry_name AS predecessor
 FROM testdata_cshape AS a
 	INNER JOIN testdata_cshape AS b
-	ON pt_successor(a.the_geom , a.validtime , b.the_geom, b.validtime);
+	ON pt_predecessor(a.the_geom , a.validtime , b.the_geom, b.validtime);
 ```
 
 The result includes among other rows:
