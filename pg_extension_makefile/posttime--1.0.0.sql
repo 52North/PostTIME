@@ -195,6 +195,15 @@ CREATE OR REPLACE FUNCTION tm_duration_dec_day(posttime)
 	LANGUAGE 'c' IMMUTABLE STRICT;
 
 -------------------------------------------------------------------
+-- SET RETURNING
+-------------------------------------------------------------------	
+	
+CREATE OR REPLACE FUNCTION pt_histogram_intervals( posttime , cstring )
+    RETURNS SETOF posttime
+    AS '$libdir/posttime'
+    LANGUAGE C IMMUTABLE STRICT;	
+
+-------------------------------------------------------------------
 -- POSTGIS DEPENDENCIES
 -------------------------------------------------------------------  
 	
@@ -207,4 +216,3 @@ CREATE OR REPLACE FUNCTION pt_predecessor(geometry, posttime, geometry, posttime
 	RETURNS boolean
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
-	

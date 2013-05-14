@@ -9,11 +9,11 @@ The PostTIME project intends to enhance PostgreSQL's capabilities to handle the 
     * Temporal coordinate systems e.g. UNIX-Time
     * Calendar and clock systems like the Gregorian calendar with UTC
     * Ordinal systems e.g. the geological eras.
-3. *Several __SQL functions__ for your __analysis__ tasks* - please see [below](https:--github.com/52North/PostTIME#posttime-sql-functions) for more information about this.
+3. *Several __SQL functions__ for your __analysis__ tasks* - please see [below](https://github.com/52North/PostTIME#posttime-sql-functions) for more information about this.
 
 The concept is basing on ISO19108. The project is in an __early stage__, so please keep in mind that PostTIME is more or less unstable and anything but complete.
 
-For example PostTIME allows to extract the successor relationships from the [Cshape](http:--nils.weidmann.ws/projects/cshapes) Dataset, which contains several countries as dynamic features, by the following SQL-Statement on the condition that the object's validtime is stored as PostTIME:
+For example PostTIME allows to extract the successor relationships from the [Cshape](http://nils.weidmann.ws/projects/cshapes) Dataset, which contains several countries as dynamic features, by the following SQL-Statement on the condition that the object's validtime is stored as PostTIME:
 
 ```mysql
 SELECT a.cntry_name , b.cntry_name AS predecessor
@@ -25,17 +25,17 @@ FROM testdata_cshape AS a
 The result includes among other rows:
   
 ```psql
-  cntry_name  |  successor   
+          cntry_name          |         predecessor          
 ------------------------------+------------------------------
- Germany Federal Republic | Germany
- Germany Democratic Republic  | Germany
+ Germany                      | Germany Federal Republic
+ Germany                      | Germany Democratic Republic
 ```
 
 
 Cshape: _Weidmann, Nils B., Doreen Kuse, and Kristian Skrede Gleditsch. 2010. The Geography of the International System: The CShapes Dataset. International Interactions 36 (1)._
 
 #Install instructions - Set up as PostgreSQL extension
-PostTIME makes use of the PostgreSQL extension feature so you need PostgreSQL version 9.1 or higher. For more information see the [PostgreSQL documentation](http:--www.postgresql.org/docs/ "www.postgresql.org/docs/").
+PostTIME makes use of the PostgreSQL extension feature so you need PostgreSQL version 9.1 or higher. For more information see the [PostgreSQL documentation](http://www.postgresql.org/docs/ "www.postgresql.org/docs/").
 
 To make PostTIME available as an extension module please download the *TimeCoding* and the *pg_extension_makefile* folder in the same directory. Then run `make` and `make install`.
 
@@ -249,4 +249,4 @@ SELECT pt_predecessor(
 The antagonist function __pt\_successor( geometry, PostTIME, geometry, PostTIME ) : boolean__ is instead true if the relative position is _Meets_.
 
 #Doxygen source code documentation
-Follow [link](http:--141.30.100.164:8080) to the doxygen documentation files of the source code.
+Follow [link](http://141.30.100.164:8080/files.html) to the doxygen documentation files of the source code. Maybe not up-to-date.
