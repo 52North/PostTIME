@@ -55,6 +55,7 @@ VALUES
 
 SELECT pt_simultaneous(posttime_1, posttime_2),posttime_1,posttime_2 FROM test4posttime_simultaneous;
 SELECT pt_overlaps(posttime_1, posttime_2),posttime_1,posttime_2 FROM test4posttime_simultaneous;
-
+SELECT pt_simultaneous_excluded_end_instants(posttime_1, posttime_2),posttime_1,posttime_2 FROM test4posttime_simultaneous;
+SELECT pt_centroid(posttime_1),posttime_1 FROM test4posttime_simultaneous;
 
 SELECT pt_simultaneous('ORD001Ediacaran/Proterozoic,Cambrian/Silurian,Devonian/Carboniferous','ORD001Ediacaran,Proterozoic');

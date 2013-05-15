@@ -8,3 +8,5 @@ pg_extension_makefile/test4ptime.jar
 pg_extension_makefile/test_script_make
 pg_extension_makefile/sql/cshape*
 pg_extension_makefile/expected/cshape*
+pg_extension_makefile/sql/*airport*
+pg_extension_makefile/expected/*airport*
