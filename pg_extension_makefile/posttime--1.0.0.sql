@@ -137,6 +137,11 @@ CREATE AGGREGATE pt_temporal_bbox (posttime) (
 -------------------------------------------------------------------
 -- more basic stuff
 
+CREATE OR REPLACE FUNCTION pt_centroid(posttime)
+	RETURNS posttime
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;  
+
 CREATE OR REPLACE FUNCTION pt_transform_system(posttime, cstring)
 	RETURNS posttime
 	AS '$libdir/posttime'
@@ -155,7 +160,12 @@ CREATE OR REPLACE FUNCTION pt_simultaneous(posttime ,posttime)
 CREATE OR REPLACE FUNCTION pt_overlaps(posttime ,posttime)
 	RETURNS boolean
 	AS '$libdir/posttime'
-	LANGUAGE 'c' IMMUTABLE STRICT;   
+	LANGUAGE 'c' IMMUTABLE STRICT;
+	
+CREATE OR REPLACE FUNCTION pt_simultaneous_excluded_end_instants(posttime ,posttime)
+	RETURNS boolean
+	AS '$libdir/posttime'
+	LANGUAGE 'c' IMMUTABLE STRICT;
 	
 CREATE OR REPLACE FUNCTION pt_weekday_int(posttime)
 	RETURNS integer
@@ -216,3 +226,86 @@ CREATE OR REPLACE FUNCTION pt_predecessor(geometry, posttime, geometry, posttime
 	RETURNS boolean
 	AS '$libdir/posttime'
 	LANGUAGE 'c' IMMUTABLE STRICT;
+	
+-------------------------------------------------------------------
+-------------------------------------------------------------------
+-- PLPGSQL FUNCTIONS
+-------------------------------------------------------------------  
+-------------------------------------------------------------------
+	
+CREATE OR REPLACE FUNCTION pt_spatiotemporal_statistics(event text , reference_geom text , duration text , bigint_id text ) 
+RETURNS TABLE( id bigint , ptime posttime , count bigint) AS
+-- RETURNS SETOF RECORD AS
+$$
+DECLARE 
+        posttime_set_first_name character varying;
+        geometry_set_first_name text;
+        geometry_set_second_name text;
+        int_id_second_name text;
+        
+	temporal_bbox posttime;
+	ptime_itr posttime;
+	geo_itr_static geometry;
+	int_itr bigint;
+	
+BEGIN
+	int_id_second_name := ($4);
+
+	EXECUTE 'SELECT (SELECT attname FROM pg_attribute WHERE 
+	attrelid = '
+	|| quote_ident($1)::regclass::oid
+	|| ' AND atttypid = '
+	|| quote_literal('posttime')
+	|| '::regtype::oid)::character varying '
+	INTO posttime_set_first_name;
+
+	EXECUTE 'SELECT (SELECT attname FROM pg_attribute WHERE 
+	attrelid = '
+	|| quote_ident($1)::regclass::oid
+	|| ' AND atttypid = '
+	|| quote_literal('geometry')
+	|| '::regtype::oid)::text '
+	INTO geometry_set_first_name;
+
+	EXECUTE 'SELECT (SELECT attname FROM pg_attribute WHERE 
+	attrelid = '
+	|| quote_ident($2)::regclass::oid
+	|| ' AND atttypid = '
+	|| quote_literal('geometry')
+	|| '::regtype::oid)::text '
+	INTO geometry_set_second_name;
+	
+	-- itr through all interval steps
+	FOR ptime_itr IN EXECUTE format('SELECT pt_histogram_intervals(pt_temporal_bbox( %s ), %L::cstring) As pt_intervals FROM %I',
+	posttime_set_first_name , $3 , $1) 
+	LOOP
+		-- itr through all simultaneous events
+		-- FOR ptime_itr_event , geo_itr_event IN EXECUTE format(
+		FOR int_itr, geo_itr_static IN EXECUTE format(
+		'SELECT %s , %s FROM %I',
+		int_id_second_name , geometry_set_second_name , $2)
+		LOOP
+			RETURN QUERY EXECUTE format('SELECT 
+			%L::bigint , 
+			%L::posttime , 
+			count(simul.%s) FROM 
+			(SELECT %s , %s FROM %I As inters WHERE 
+			pt_simultaneous_excluded_end_instants( pt_centroid(%s) , %L ) = TRUE) As simul
+			WHERE ST_Intersects( %s , %L::geometry ) GROUP BY %L::bigint',
+			int_itr,
+			ptime_itr,
+			posttime_set_first_name,
+			posttime_set_first_name, 
+			geometry_set_first_name, 
+			$1 , 
+			posttime_set_first_name , 
+			ptime_itr,
+			geometry_set_first_name,
+			geo_itr_static,
+			int_itr);
+--			RETURN QUERY SELECT ptime_itr , int_itr , count_itr;
+		END LOOP;
+	END LOOP;
+	
+END;
+$$ LANGUAGE plpgsql;

@@ -23,8 +23,10 @@ Datum tm_distance_dec_day(PG_FUNCTION_ARGS);
 Datum tm_duration(PG_FUNCTION_ARGS);
 Datum tm_duration_dec_day(PG_FUNCTION_ARGS);
 Datum pt_simultaneous(PG_FUNCTION_ARGS);
+Datum pt_simultaneous_excluded_end_instants(PG_FUNCTION_ARGS);
 Datum pt_overlaps(PG_FUNCTION_ARGS);
 Datum pt_weekday_int(PG_FUNCTION_ARGS);
+Datum pt_centroid(PG_FUNCTION_ARGS);
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
@@ -334,6 +336,24 @@ tm_duration_dec_day(PG_FUNCTION_ARGS){
     PG_RETURN_FLOAT8(float_ret);
 }
 
+PG_FUNCTION_INFO_V1(pt_centroid);
+Datum
+pt_centroid(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_centroid = palloc(sizeof(POSTTIME));
+	memset(ptime_centroid,'\0', sizeof(POSTTIME));
+	pt_error_type ret_err = NO_ERROR;
+
+	ret_err = centroid( ptime, ptime_centroid );
+	if( ret_err != NO_ERROR ){
+		FREE_MEM(ptime_centroid);
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
+	PG_RETURN_POINTER(ptime_centroid);
+}
+
 PG_FUNCTION_INFO_V1(pt_simultaneous);
 Datum
 pt_simultaneous(PG_FUNCTION_ARGS){
@@ -342,6 +362,23 @@ pt_simultaneous(PG_FUNCTION_ARGS){
 	bool ret = FALSE;
 	pt_error_type ret_err = NO_ERROR;
 	ret_err = simultaneous( ptime_1 , ptime_2 , &ret );
+	if( ret_err != NO_ERROR ){
+		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				errmsg("%s",pt_error_msgs[ret_err].msg)));
+		PG_RETURN_NULL();
+	}
+
+    PG_RETURN_BOOL( ret );
+}
+
+PG_FUNCTION_INFO_V1(pt_simultaneous_excluded_end_instants);
+Datum
+pt_simultaneous_excluded_end_instants(PG_FUNCTION_ARGS){
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	bool ret = FALSE;
+	pt_error_type ret_err = NO_ERROR;
+	ret_err = simultaneous_excluded_end_instants( ptime_1 , ptime_2 , &ret );
 	if( ret_err != NO_ERROR ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				errmsg("%s",pt_error_msgs[ret_err].msg)));
@@ -386,4 +423,5 @@ pt_weekday_int(PG_FUNCTION_ARGS){
 
     PG_RETURN_INT32( weekday );
 }
+
 

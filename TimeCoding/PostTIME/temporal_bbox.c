@@ -59,3 +59,19 @@ pt_error_type temporal_bbox_single_two_instances( POSTTIME * ptime_1 , POSTTIME 
 	}
 	return NO_ERROR;
 }
+
+pt_error_type centroid(POSTTIME * ptime, POSTTIME * centroid){
+	if( ptime->refsys.type == 3 ) return FUNCTION_UNDEFINED_FOR_ORDINAL;
+	centroid->type = 1;
+	centroid->refsys.type = ptime->refsys.type;
+	centroid->refsys.instance = ptime->refsys.instance;
+
+	POSTTIME * bbox = palloc( sizeof(POSTTIME) + sizeof(JULIAN_DAY) );
+	memset( bbox , 0 , sizeof(POSTTIME) + sizeof(JULIAN_DAY));
+	temporal_bbox_single_instance( ptime , bbox );
+	centroid->data[0] = ( bbox->data[0] + bbox->data[1] ) / 2;
+
+	SET_VARSIZE(centroid, sizeof(POSTTIME));
+	FREE_MEM(bbox);
+	return NO_ERROR;
+}
