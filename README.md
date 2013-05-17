@@ -1,5 +1,6 @@
 # PostTIME
-![Logo](http://github.com/52North/PostTIME/logo.png)
+
+![Logo](logo.png?raw=true)
 
 The PostTIME project intends to enhance PostgreSQL's capabilities to handle the temporal dimension with a focus on processing spatial information. For that purpose it provides:
 
