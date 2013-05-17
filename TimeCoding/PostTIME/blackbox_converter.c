@@ -329,7 +329,7 @@ pt_error_type instant_strings_to_ptime_instants(int32 *int_count, POSTTIME *ptim
 						ret_err = PERIOD_START_BEFORE_END;
 						break;
 					}
-					adjust_dn_to_granularity(dn_tmp + i + 1 , cal_system );
+					adjust_dn_to_granularity(dn_tmp + (i * 2) + 1 , cal_system );
 				}
 			}
 			if( ret_err == NO_ERROR ){

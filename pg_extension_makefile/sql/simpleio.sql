@@ -7,6 +7,7 @@ CREATE TABLE pt_simpleio_table (id serial, ptime posttime);
 INSERT INTO pt_simpleio_table( ptime )
 VALUES
 /* GREG */
+('2010/2013,2016-2-3T12/2020'),
 ('2013'),
 ('2013-1'),
 ('2013-1-31'),
