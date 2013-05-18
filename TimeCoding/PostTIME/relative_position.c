@@ -214,7 +214,7 @@ pt_error_type simultaneous(POSTTIME * ptime1 , POSTTIME * ptime2 , bool * is_sim
 			}
 		}
 		else if( type_1 == 1 && type_2 == 2 ){
-			for( i = 0 ; i < count_1 ; i = i++ ){
+			for( i = 0 ; i < count_1 ; i++ ){
 				for( j = 0 ; j < count_2 ; j = j + 2 ){
 					if( ptime2_intern->data[j] <= ptime1_intern->data[i] && ptime2_intern->data[j+1] >= ptime1_intern->data[i] ){
 						*is_simultaneous = TRUE;
@@ -370,7 +370,7 @@ pt_error_type simultaneous_excluded_end_instants(POSTTIME * ptime1 , POSTTIME * 
 			}
 		}
 		else if( type_1 == 1 && type_2 == 2 ){
-			for( i = 0 ; i < count_1 ; i = i++ ){
+			for( i = 0 ; i < count_1 ; i++ ){
 				for( j = 0 ; j < count_2 ; j = j + 2 ){
 					if( ptime2_intern->data[j] <= ptime1_intern->data[i] && ptime2_intern->data[j+1] > ptime1_intern->data[i] ){
 						*is_simultaneous = TRUE;
