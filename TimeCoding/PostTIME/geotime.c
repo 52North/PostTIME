@@ -9,6 +9,8 @@
 #include "calendars.h"
 #include "blackbox_converter.h"
 
+char postgis_sharedlib[17] = "0123456789ABCDEF";
+
 const char * refsys_types[NUMBER_REFSYS_TYPES] = { CALENDAR_FLAG, TEMPORAL_COORDINATE_FLAG, ORDINAL_FLAG };
 
 /*! Convert an RegularMulti into a 'norma' Multi object.

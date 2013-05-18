@@ -32,6 +32,30 @@ Datum pt_centroid(PG_FUNCTION_ARGS);
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
 #endif
 
+
+void _PG_init(){
+	SPI_connect();
+	int32 ret = SPI_execute("SELECT extversion FROM pg_extension WHERE extname = 'postgis'" , TRUE , 1);
+
+	if (ret > 0 && SPI_tuptable != NULL){
+		char * str_out = SPI_getvalue( SPI_tuptable->vals[0] , SPI_tuptable->tupdesc , 1 );
+
+		memset(postgis_sharedlib, '\0', sizeof(char)*( 17 ));
+		strncpy(postgis_sharedlib, "postgis-", 9);
+		strncpy(&postgis_sharedlib[8] , str_out, 3);
+		strncpy(&postgis_sharedlib[11] , ".so", 3);
+	}
+	else {
+		memset(postgis_sharedlib, '\0', sizeof(char)*( 16 ));
+		strncpy(postgis_sharedlib, "postgis-", 9);
+		strncpy(&postgis_sharedlib[8]  , "1.5", 3);
+		strncpy(&postgis_sharedlib[11] , ".so", 3);
+	}
+	void * * pgis_filehandle = (void *) 0;
+	pgis_relate_pattern = load_external_function(postgis_sharedlib,"relate_pattern", 1 ,pgis_filehandle);
+	SPI_finish();
+}
+
 PG_FUNCTION_INFO_V1(posttime_in);
 /*! The type's constructor. Has to extract all information from a given
  * string and has to verify syntactical and semantical correctness.

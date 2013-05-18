@@ -18,7 +18,6 @@ pt_predecessor(PG_FUNCTION_ARGS){
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(3);
 
 	Datum datum_ret = 0;
-	void * * pgis_filehandle = (void *) 0;
 	bool overlaps = false;
 	bool ptime_ret = false;
 	int32 ret_relativepos = 0;
@@ -35,8 +34,7 @@ pt_predecessor(PG_FUNCTION_ARGS){
 			memcpy( my_pattern->vl_dat , "T********" , 10 );
 			SET_VARSIZE( my_pattern , sizeof(char) * 14);
 
-			PGFunction pgis_overlaps = load_external_function(POSTGIS_SHLIB_NAME,"relate_pattern", 1 ,pgis_filehandle);
-			datum_ret = DirectFunctionCall3Coll(pgis_overlaps, 2, geom_1 , geom_2, my_pattern);
+			datum_ret = DirectFunctionCall3Coll(pgis_relate_pattern, 2, geom_1 , geom_2, my_pattern);
 			overlaps = DatumGetBool(datum_ret);
 
 			ptime_ret = overlaps;
@@ -55,7 +53,6 @@ pt_successor(PG_FUNCTION_ARGS){
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(3);
 
 	Datum datum_ret = 0;
-	void * * pgis_filehandle = (void *) 0;
 	bool overlaps = false;
 	bool ptime_ret = false;
 	int32 ret_relativepos = 0;
@@ -72,8 +69,7 @@ pt_successor(PG_FUNCTION_ARGS){
 			memcpy( my_pattern->vl_dat , "T********" , 10 );
 			SET_VARSIZE( my_pattern , sizeof(char) * 14);
 
-			PGFunction pgis_overlaps = load_external_function(POSTGIS_SHLIB_NAME,"relate_pattern", 1 ,pgis_filehandle);
-			datum_ret = DirectFunctionCall3Coll(pgis_overlaps, 2, geom_1 , geom_2, my_pattern);
+			datum_ret = DirectFunctionCall3Coll(pgis_relate_pattern, 2, geom_1 , geom_2, my_pattern);
 			overlaps = DatumGetBool(datum_ret);
 
 			ptime_ret = overlaps;

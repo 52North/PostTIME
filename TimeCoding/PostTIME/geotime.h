@@ -5,6 +5,10 @@
 
 #include "postgres.h"
 #include "fmgr.h"
+
+#include "executor/spi.h"
+#include "utils/builtins.h"
+
 #include "pt_errors.h"
 #include "utils/timestamp.h"
 #include "utils/date.h"
@@ -12,7 +16,10 @@
 #ifndef GEOTIME_H_
 #define GEOTIME_H_
 
-#define POSTGIS_SHLIB_NAME "postgis-2.0.so"
+// #define POSTGIS_SHLIB_NAME "postgis-2.0.so"
+
+extern char postgis_sharedlib[];
+PGFunction pgis_relate_pattern;
 
 /* Less code macros */
 #define FREE_MEM(p)   do { pfree(p); (p) = NULL; } while(0);
