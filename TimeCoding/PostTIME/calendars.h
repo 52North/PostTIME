@@ -51,6 +51,10 @@ typedef struct calendar_system {
 
 extern const calendar_system calendar_systems[];
 
+BYTE check_value(int32 min, int32 max, int32 value);
+int64 clock_time_to_dec_days(const DATE_NUMBERS * dn, const clock_system * clock_sys);
+int32 correction_term_gregorian(DATE_NUMBERS * dn);
+void dec_days_to_clock_time(DATE_NUMBERS * dn, int64 * time, const clock_system * clock_sys);
 DATE_NUMBERS dn_plus_dn(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_add, calendar_era * cal);
 DATE_NUMBERS dn_minus_period(DATE_NUMBERS * dn_in, DATE_NUMBERS * dn_minus, calendar_era * cal);
 DATE_NUMBERS dn_minus_dn(DATE_NUMBERS * dn_later, DATE_NUMBERS * dn_earlier, calendar_era * cal);
