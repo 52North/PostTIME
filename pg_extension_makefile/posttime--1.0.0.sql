@@ -52,8 +52,11 @@ CREATE TYPE posttime (
 
 CREATE OR REPLACE FUNCTION posttime(text)
         RETURNS posttime
-        AS '$libdir/posttime','posttime_in'
-        LANGUAGE 'c' IMMUTABLE STRICT;
+        AS $$
+        BEGIN
+        RETURN posttime_in($1::cstring);
+        END;
+		$$ LANGUAGE plpgsql;
 
 CREATE CAST (text AS posttime)
         WITH FUNCTION posttime(text)
