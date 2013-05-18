@@ -126,7 +126,6 @@ pt_error_type duration_jul_day( POSTTIME * ptime , float8 * jul_day_out){
 /*!ISO19108 primitive function. tm_distance */
 pt_error_type duration_string(POSTTIME * ptime, char * duration_out){
 	pt_error_type err_ret = NO_ERROR;
-	int32 relative_pos = 0;
 
 	if( ptime->type > 2 ){
 		strcpy( duration_out , "NAP" );

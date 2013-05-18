@@ -300,7 +300,7 @@ int64 clock_time_to_dec_days(const DATE_NUMBERS * dn, const clock_system * clock
 	float8 sec = (dn->sec * ( (float8) ms_per_sec) );
 	int64 int_sec = (int64) sec;
 	int64 time = 0;
-	time = dn->hou * ms_per_hour + dn->min * ms_per_min + sec;
+	time = dn->hou * ms_per_hour + dn->min * ms_per_min + int_sec;
 	return time;
 }
 
