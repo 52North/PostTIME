@@ -2,7 +2,7 @@
 
 ![Logo](logo.png?raw=true)
 
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/e4be0e5f525928d7332fd50baff72774 "githalytics.com")](http://githalytics.com/52North/PostTIME)The PostTIME project intends to enhance PostgreSQL's capabilities to handle the temporal dimension with a focus on processing spatial information. For that purpose it provides:
+The PostTIME project intends to enhance PostgreSQL's capabilities to handle the temporal dimension with a focus on processing spatial information. For that purpose it provides:
 
 1. *__6__ different __object types__ to abstract time*
     * Instants and periods of time
@@ -117,3 +117,4 @@ ORDER BY count DESC LIMIT 1;
  10 | CAL0011948-01-01T00:00:00.000Z/1953-01-01T00:00:00.000Z |    37 | Alaska
 ```
 
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/52North/PostTIME/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
