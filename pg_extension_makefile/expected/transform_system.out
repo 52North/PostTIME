@@ -34,6 +34,36 @@ SELECT pt_transform_system('TCS0011','TCS003');
  TCS00386400000.000000
 (1 row)
 
+SELECT pt_transform_system('1970-1-1T0:0:0.001','CAL002');
+      pt_transform_system       
+--------------------------------
+ CAL0021969-12-19T00:00:00.001Z
+(1 row)
+
+SELECT pt_transform_system('1980-12-1T0:0:0.001','CAL002');
+      pt_transform_system       
+--------------------------------
+ CAL0021980-11-18T00:00:00.001Z
+(1 row)
+
+SELECT pt_transform_system('2000-12-31T0:0:0.001','CAL002');
+      pt_transform_system       
+--------------------------------
+ CAL0022000-12-18T00:00:00.001Z
+(1 row)
+
+SELECT pt_transform_system('1970-1-1T0:0:0.001/1980-12-1T11:22:33.123,1981-1-1T0:0:0.001/1991-12-1T11:22:33.123','CAL002');
+                                            pt_transform_system                                            
+-----------------------------------------------------------------------------------------------------------
+ CAL0021969-12-19T00:00:00.001Z/1980-11-18T11:22:33.123Z,1980-12-19T00:00:00.001Z/1991-11-18T11:22:33.123Z
+(1 row)
+
+SELECT pt_transform_system('1970-1-1T0:0:0.001,1980-12-1T11:22:33.123,1981-1-1T0:0:0.001,1991-12-1T11:22:33.123','CAL002');
+                                            pt_transform_system                                            
+-----------------------------------------------------------------------------------------------------------
+ CAL0021969-12-19T00:00:00.001Z,1980-11-18T11:22:33.123Z,1980-12-19T00:00:00.001Z,1991-11-18T11:22:33.123Z
+(1 row)
+
 /* regular types */
 SELECT pt_transform_system('R10/1970-1-1T0:1/PT1S','TCS002');
       pt_transform_system      
@@ -56,7 +86,7 @@ SELECT pt_transform_system('ORD001Triassic','TCS002');
  TCS002-210866759999.989990
 (1 row)
 
-SELECT pt_transform_system('1970-1-1T0:0:0.001','CAL002');
+SELECT pt_transform_system('1970-1-1T0:0:0.001','CAL003');
 ERROR:  A calendar system with the given id is unknown.
 SELECT pt_transform_system('1970-1-1T0:0:0.001','dasdfa');
 ERROR:  Please specify only the new reference system.

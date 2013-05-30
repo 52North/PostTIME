@@ -424,11 +424,80 @@ const calendar_era gregorian = {
 };
 
 /************************************************************************************
+		J U L I A N  		C A L E N D A R
+ ************************************************************************************/
+
+const calendar_era julian;
+
+/*!Leap year test for Julian calendar.
+ * @param[in] Given year.
+ * \return 1=Yes 0=No. */
+static BYTE leapyear_jul(int32 year){
+	BYTE byte_ret = 0;
+	if ((year % 4) == 0) byte_ret = 1;
+	return byte_ret;
+}
+
+/*!Convert the given DATE_NUMBERS to JULIAN_DAY basing on the Julian calendar.
+ * @param[in] dn Input values.
+ * \return The transformed JULIAN_DAY. */
+static JULIAN_DAY dnumber_to_jday_jul( DATE_NUMBERS * dn ){
+	JULIAN_DAY jd = 0;
+	int64 Y = dn->yea + 4716 -(14-dn->mon)/12;
+	int64 M = (dn->mon+9)%12;
+	int64 D = dn->day-1;
+	int64 c = (1461*Y)/4;
+	int64 d = (153*M + 2)/5;
+	/* ISO19108 P.49 */
+	jd = ( ( c + d + D - 1401 ) * (int64) MILLIS ) - 43200000;
+	int64 dec_day = clock_time_to_dec_days(dn , julian.clock_system);
+	jd = jd + dec_day;
+	return jd;
+}
+
+/*!Convert the given JULIAN_DAY in DATE_NUMBERS basing on the Julian calendar.
+ * @param[in] jd The JULIAN_DAY value.
+ * \return The transformed DATE_NUMBERS. */
+static DATE_NUMBERS jday_to_dnumbers_jul( JULIAN_DAY * jd ){
+	DATE_NUMBERS dn;
+	int32 J = (int32) ( (*jd + 43200000) / MILLIS);
+	// int32 J = (int32)(*jd+0.5);  /* jd without daytime */
+	int64 F = (*jd + 43200000) % MILLIS;	/* daytime */
+	J = J+1401;
+	int32 Y = (4*J+3) / 1461;
+	int32 T = ( (4*J+3) % 1461) / 4;
+	int32 M = (5*T+2) / 153;
+	int32 D = ( (5*T+2) % 153) / 5;
+	dn.day = D+1;
+	dn.mon = ((M+2)%12) + 1;
+	dn.yea = Y-4716 + ((14-dn.mon)/12);
+	dec_days_to_clock_time(&dn, &F, julian.clock_system);
+	return dn;
+}
+
+const DATE_NUMBERS dn_lower_boundary_jul = { 0, -4713, 1, 1, 0, 0, 0, 0, SECOND };
+
+/*!The Julian calendar. */
+const calendar_era julian = {
+	&leapyear_jul,
+	&dn_lower_boundary_jul,
+	&dn_upper_boundary_gregorian,
+	12,
+	12,
+	days_per_month_gregorian,
+	days_per_month_gregorian_leap,
+	&dnumber_to_jday_jul,
+	&jday_to_dnumbers_jul,
+	&clock_ut
+};
+
+/************************************************************************************
 		T H E	C A L E N D A R		S Y S T E M S
  ************************************************************************************/
 
-const calendar_system calendar_systems[1] = {
+const calendar_system calendar_systems[2] = {
 		{ 1 , &gregorian },
+		{ 2 , &julian },
 };
 
 calendar_era * get_system_from_key( int32 key ){

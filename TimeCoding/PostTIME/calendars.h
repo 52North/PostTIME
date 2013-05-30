@@ -4,7 +4,7 @@
 
 #include "geotime.h"
 
-#define NUMBER_OF_CAL_SYS 1
+#define NUMBER_OF_CAL_SYS 2
 
 /*!Struct to handle date values. It is quite similar to the tm struct,
  * but with some differences. Do not change the order or size of the fields!
