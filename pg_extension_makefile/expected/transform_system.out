@@ -34,6 +34,19 @@ SELECT pt_transform_system('TCS0011','TCS003');
  TCS00386400000.000000
 (1 row)
 
+/* regular types */
+SELECT pt_transform_system('R10/1970-1-1T0:1/PT1S','TCS002');
+      pt_transform_system      
+-------------------------------
+ TCS002R10/60.000000/P1.000000
+(1 row)
+
+SELECT pt_transform_system('TCS002R10/2/P1','CAL001');
+             pt_transform_system             
+---------------------------------------------
+ CAL001R10/1970-01-01T00:00:02.000Z/PT1.000S
+(1 row)
+
 /* error */
 SELECT pt_transform_system('1970-1-1T0:0:0.001','ORD001');
 ERROR:  This function does not work with Ordinal Systems
