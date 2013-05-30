@@ -513,9 +513,9 @@ pt_error_type regular_strings_to_ptime_instance(POSTTIME * ptime_tmp, char ** st
 			}
 			ptime_tmp->data[0] = (int64) int_r_value;
 			ptime_tmp->data[1] = tcs_to_jday( &float_instant , tcs_system);
-			ptime_tmp->data[2] = tcs_to_jday( &float_period_valid , tcs_system);
+			ptime_tmp->data[2] = tcs_system->scaling_factor * float_period_valid;
 			if(ptime_tmp->type == 6) {
-				ptime_tmp->data[3] = tcs_to_jday( &float_period_invalid , tcs_system);
+				ptime_tmp->data[3] = tcs_system->scaling_factor * float_period_invalid;
 			}
 			break;
 		}

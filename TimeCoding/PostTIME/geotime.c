@@ -9,7 +9,7 @@
 #include "calendars.h"
 #include "blackbox_converter.h"
 
-char postgis_sharedlib[17] = "0123456789ABCDEF";
+char postgis_sharedlib[50] = "0123456789ABCDEF";
 
 const char * refsys_types[NUMBER_REFSYS_TYPES] = { CALENDAR_FLAG, TEMPORAL_COORDINATE_FLAG, ORDINAL_FLAG };
 
@@ -103,4 +103,53 @@ pt_error_type get_rvalue(POSTTIME * ptime_reg, int32 * rvalue){
 		}
 	}
 	return ret_err;
+}
+
+
+pt_error_type transform_regular_system( POSTTIME * ptime , REFSYS * refsys_new , POSTTIME * ptime_new ){
+	DATE_NUMBERS dn_0 , dn_valid, dn_invalid, dn_result, dn_result_2;
+	JULIAN_DAY tmp = 0;
+	memset(&dn_valid , 0 , sizeof(DATE_NUMBERS));
+	memset(&dn_invalid , 0 , sizeof(DATE_NUMBERS));
+	memset(&dn_0 , 0 , sizeof(DATE_NUMBERS) );
+	memset(&dn_result , 0 , sizeof(DATE_NUMBERS) );
+	memset(&dn_result_2 , 0 , sizeof(DATE_NUMBERS) );
+	int32 rvalue = 0;
+	calendar_era * cal_system;
+	ptime_new->type = ptime->type;
+	ptime_new->refsys = *refsys_new;
+	switch( ptime->refsys.type ){
+	case 1:
+		cal_system = get_system_from_key( ptime->refsys.instance );
+		dn_0 = cal_system->jday_to_dnumbers( &(ptime->data[0]) );
+		jday_pack_to_dn_period( &dn_valid, (JULIAN_DAY *) &ptime->data[1], &rvalue);
+		dn_result = dn_plus_dn( &dn_0 , &dn_valid, cal_system );
+		ptime_new->data[0] = rvalue;
+		ptime_new->data[1] = ptime->data[0];
+		ptime_new->data[2] = cal_system->dnumber_to_jday( &dn_result ) - ptime->data[0];
+		if( ptime->type == 6 ){
+			jday_pack_to_dn_period( &dn_invalid, (JULIAN_DAY *) &ptime->data[5], &rvalue);
+			dn_result_2 = dn_plus_dn( &dn_result , &dn_valid, cal_system );
+			ptime_new->data[3] = cal_system->dnumber_to_jday( &dn_result_2 ) - ptime_new->data[2];
+		}
+		break;
+	case 2:
+		rvalue = ptime->data[0];
+		ptime_new->data[0] = ptime->data[1];
+		cal_system = get_system_from_key( refsys_new->instance );
+		dn_0 = cal_system->jday_to_dnumbers( &ptime->data[1] );
+		tmp = ptime->data[1] + ptime->data[2];
+		dn_valid = cal_system->jday_to_dnumbers( &tmp );
+		dn_result = dn_minus_dn( &dn_valid , &dn_0 , cal_system );
+		dn_period_to_jday_pack( &dn_result , &ptime_new->data[1] , rvalue );
+		if( ptime->type == 6 ){
+			tmp = tmp + ptime->data[3];
+			dn_invalid = cal_system->jday_to_dnumbers( &tmp );
+			dn_result_2 = dn_minus_dn( &dn_invalid , &dn_valid , cal_system );
+			dn_period_to_jday_pack( &dn_result_2 , &ptime_new->data[5] , 0 );
+		}
+		break;
+	}
+
+	return NO_ERROR;
 }

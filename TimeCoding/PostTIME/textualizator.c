@@ -188,12 +188,15 @@ void ptime_to_string_tcs( POSTTIME * ptime , char * str_out , int32 * int_count 
 		}
 		break;
 	case 5:
+		float_values[2] = (float8) ptime->data[2] / (float8) tcs_system->scaling_factor;
 		julianday_cat_instantstring( &float_values[1] , str_out );
 		strncat(str_out,&period_sep,1);
 		sprintf( str_tmp , "P%lf" , float_values[2] );
 		strcat( str_out , str_tmp );
 		break;
 	case 6:
+		float_values[2] = (float8) ptime->data[2] / (float8) tcs_system->scaling_factor;
+		float_values[3] = (float8) ptime->data[3] / (float8) tcs_system->scaling_factor;
 		julianday_cat_instantstring( &float_values[1] , str_out );
 		strncat( str_out , &period_sep,1);
 		sprintf( str_tmp , "P%lf" , float_values[2] );

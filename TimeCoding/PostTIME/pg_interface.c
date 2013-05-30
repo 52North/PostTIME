@@ -133,9 +133,9 @@ pt_transform_system(PG_FUNCTION_ARGS){
 	char * str_in = PG_GETARG_CSTRING(1);
 	char * char_tmp = "P";
 	char * * dummy = &char_tmp;
+
 	POSTTIME * ptime_ret = (POSTTIME *) palloc(VARSIZE(ptime));
 	memset( ptime_ret, 0 ,VARSIZE(ptime) );
-
 	pt_error_type err = determine_refsys( str_in , dummy , ptime_ret );
 	if( ptime_ret->refsys.type == 3 ) err = FUNCTION_UNDEFINED_FOR_ORDINAL;
 	if(*(dummy[0]) != 0 && err == NO_ERROR) err = SPECIFY_ONLY_THE_NEW_SYSTEM;
@@ -151,7 +151,25 @@ pt_transform_system(PG_FUNCTION_ARGS){
 			VARSIZE(ptime) - VARHDRSZ -sizeof(REFSYS) );
 	SET_VARSIZE( ptime_ret, VARSIZE(ptime) );
 
-	PG_RETURN_POINTER(ptime_ret);
+	if( ptime->type > 4 && ( ptime->refsys.type != ptime_ret->refsys.type ) ){
+		int32 data_count_needed = 0;
+		if( ptime_ret->refsys.type == 1 ){
+			if( ptime->type == 5 ) data_count_needed = 5;
+			else data_count_needed = 9;
+		}
+		else if( ptime_ret->refsys.type == 2 ){
+			if( ptime->type == 5 ) data_count_needed = 3;
+			else data_count_needed = 4;
+		}
+		size_t size_needed = sizeof(POSTTIME) + sizeof(JULIAN_DAY) * (data_count_needed - 1);
+		POSTTIME * ptime_ret_reg = (POSTTIME *) palloc(size_needed);
+		memset( ptime_ret_reg, 0 ,size_needed );
+		transform_regular_system( ptime , &ptime_ret->refsys , ptime_ret_reg );
+		FREE_MEM(ptime_ret);
+		SET_VARSIZE(ptime_ret_reg , size_needed);
+		PG_RETURN_POINTER(ptime_ret_reg);
+	}
+	else PG_RETURN_POINTER(ptime_ret);
 }
 
 PG_FUNCTION_INFO_V1(pt_regular_multi_to_multi);

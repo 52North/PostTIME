@@ -71,5 +71,6 @@ typedef enum calendar_gran { YEAR, MONTH, DAY, HOUR, MINUTE, SECOND } calendar_g
 
 void regular_multi_to_multi( POSTTIME * ptime_reg , POSTTIME * ptime_multi );
 pt_error_type get_rvalue(POSTTIME * ptime_reg, int32 * rvalue);
+pt_error_type transform_regular_system( POSTTIME * ptime , REFSYS * refsys_new , POSTTIME * ptime_new );
 
 #endif /* GEOTIME_H_ */
