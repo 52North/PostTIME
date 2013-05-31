@@ -116,5 +116,3 @@ ORDER BY count DESC LIMIT 1;
 ----+---------------------------------------------------------+-------+--------
  10 | CAL0011948-01-01T00:00:00.000Z/1953-01-01T00:00:00.000Z |    37 | Alaska
 ```
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/52North/PostTIME/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

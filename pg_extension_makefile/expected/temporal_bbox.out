@@ -1,0 +1,52 @@
+SELECT pt_temporal_bbox(ptime) FROM pt_simpleio_table;
+ERROR:  All PostTIME instances used as function arguments have to share the same temporal reference system.
+SELECT pt_centroid('2013');
+          pt_centroid           
+--------------------------------
+ CAL0012013-07-02T12:00:00.000Z
+(1 row)
+
+SELECT pt_centroid('2013-2-2T12:30:40.123');
+          pt_centroid           
+--------------------------------
+ CAL0012013-02-02T12:30:40.123Z
+(1 row)
+
+SELECT pt_centroid('CAL0022013-2-2T12:30:40.123');
+          pt_centroid           
+--------------------------------
+ CAL0022013-02-02T12:30:40.123Z
+(1 row)
+
+SELECT pt_centroid('R21/2014-2-3/P1D/P2D');
+          pt_centroid           
+--------------------------------
+ CAL0012014-03-07T00:00:00.000Z
+(1 row)
+
+SELECT pt_centroid('R86/2014-2-3/P1DT2.123S');
+          pt_centroid           
+--------------------------------
+ CAL0012014-03-18T00:01:31.288Z
+(1 row)
+
+SELECT pt_centroid('2013-2-2T12:30:40.123/2013-2-4T12:30:40.123');
+          pt_centroid           
+--------------------------------
+ CAL0012013-02-03T12:30:40.123Z
+(1 row)
+
+SELECT pt_centroid('TCS002123456/234567');
+     pt_centroid     
+---------------------
+ TCS002179011.500000
+(1 row)
+
+SELECT pt_centroid('2013-2-2T12:30:40.123,2013-2-4T12:30:40.123,2015-2-2T12:30:40.123,2016-2-4T12:30:40.124,2017-2-2T12:30:40.123,2018-2-4T12:30:40.123,2019-2-2T12:30:40.123,2020-2-4T12:30:40.124,2021-2-2T12:30:40.123,2022-2-4T12:30:40.123,2023-2-2T12:30:40.123,2024-2-4T12:30:40.124,2013-2-2T12:30:40.123,2025-2-4T12:30:40.123,2026-2-2T12:30:40.123,2027-2-4T12:30:40.124');
+          pt_centroid           
+--------------------------------
+ CAL0012020-02-04T00:30:40.123Z
+(1 row)
+
+SELECT pt_centroid('ORD001Ediacaran,Proterozoic');
+ERROR:  This function does not work with Ordinal Systems
