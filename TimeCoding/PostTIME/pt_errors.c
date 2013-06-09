@@ -57,5 +57,7 @@ const pt_error_msg pt_error_msgs[] = {
 		"Can only cast a period if the start instant and the end instant share the same day."},
 		{ONLY_INSTANTS_FUNCTIONS,
 		"This functions works only with instants."},
+		{ONLY_PERIODS_FUNCTIONS,
+		"This functions works only with periods."},
 };
 

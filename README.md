@@ -1,5 +1,7 @@
 # PostTIME
 
+Please note also __[the wiki](http://www.github.com/52North/PostTIME/wiki)__.
+
 ![Logo](logo.png?raw=true)
 
 [![githalytics.com alpha](https://cruel-carlota.pagodabox.com/b29ca19e39395452424f91c3f7bf80c8 "githalytics.com")](http://githalytics.com/52North/PostTIME)The PostTIME project intends to enhance PostgreSQL's capabilities to handle the temporal dimension with a focus on processing spatial information. For that purpose it provides:
@@ -15,8 +17,6 @@
 3. *Several __SQL functions__ for your __analysis__ tasks*.
 
 The concept is basing on ISO19108. The project is in an __early stage__, so please keep in mind that PostTIME is more or less unstable and anything but complete.
-
-Please see __[the wiki](http://www.github.com/52North/PostTIME/wiki)__ for more information.
 
 There is also a __[doxygen documentation](http://141.30.100.164:8080/files.html)__ of the source code available. Maybe not up-to-date.
 
@@ -116,5 +116,7 @@ ORDER BY count DESC LIMIT 1;
 ----+---------------------------------------------------------+-------+--------
  10 | CAL0011948-01-01T00:00:00.000Z/1953-01-01T00:00:00.000Z |    37 | Alaska
 ```
+
+Please note also __[the wiki](http://www.github.com/52North/PostTIME/wiki)__.
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/52North/PostTIME/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

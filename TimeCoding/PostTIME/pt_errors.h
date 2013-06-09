@@ -37,6 +37,7 @@ typedef enum pt_error_type {
 	CAN_ONLY_CAST_PTIME_INSTANTS,
 	CAN_ONLY_CAST_PERIOD_IF_SAME_DAY,
 	ONLY_INSTANTS_FUNCTIONS,
+	ONLY_PERIODS_FUNCTIONS
 } pt_error_type;
 
 typedef struct pt_error_msg {

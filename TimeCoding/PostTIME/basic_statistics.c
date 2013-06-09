@@ -28,9 +28,11 @@ pt_histogram_intervals(PG_FUNCTION_ARGS){
         /* One-time Setup fctx, calculate first 'next' */
         POSTTIME * ptime_bbox_in = (POSTTIME *) PG_GETARG_POINTER(0);
         DATE_NUMBERS dn_first;
-
+        pt_error_type ret_err = NO_ERROR;
+        if(ptime_bbox_in->refsys.type == 3) ret_err = FUNCTION_UNDEFINED_FOR_ORDINAL;
+        else if(ptime_bbox_in->type != 2) ret_err = ONLY_PERIODS_FUNCTIONS;
         // Get duration.
-        pt_error_type ret_err = parse_single_duration_string( PG_GETARG_CSTRING(1) , &fctx->period );
+        if(ret_err == NO_ERROR) ret_err = parse_single_duration_string( PG_GETARG_CSTRING(1) , &fctx->period );
         if( ret_err != NO_ERROR ){
         	FREE_MEM(fctx);
     		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
