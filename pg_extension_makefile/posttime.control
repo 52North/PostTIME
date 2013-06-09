@@ -2,4 +2,5 @@
 comment = 'Temporal enable your PostGIS-backend'
 default_version = '1.0.0'
 module_pathname = '$libdir/posttime'
+requires = 'postgis'
 relocatable = true

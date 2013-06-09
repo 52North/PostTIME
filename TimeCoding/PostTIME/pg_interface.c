@@ -27,6 +27,9 @@ Datum pt_simultaneous_excluded_end_instants(PG_FUNCTION_ARGS);
 Datum pt_overlaps(PG_FUNCTION_ARGS);
 Datum pt_weekday_int(PG_FUNCTION_ARGS);
 Datum pt_centroid(PG_FUNCTION_ARGS);
+Datum pt_type(PG_FUNCTION_ARGS);
+Datum pt_refsys_type(PG_FUNCTION_ARGS);
+Datum pt_refsys_instance(PG_FUNCTION_ARGS);
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC; /*!< The mandatory PG_MODUL_MAGIC macro is defined here. */
@@ -170,6 +173,33 @@ pt_transform_system(PG_FUNCTION_ARGS){
 		PG_RETURN_POINTER(ptime_ret_reg);
 	}
 	else PG_RETURN_POINTER(ptime_ret);
+}
+
+PG_FUNCTION_INFO_V1(pt_type);
+Datum
+pt_type(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+	int32 int_ret;
+	int_ret = (int32) ptime->type;
+	PG_RETURN_INT32(int_ret);
+}
+
+PG_FUNCTION_INFO_V1(pt_refsys_type);
+Datum
+pt_refsys_type(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+	int32 int_ret;
+	int_ret = (int32) ptime->refsys.type;
+	PG_RETURN_INT32(int_ret);
+}
+
+PG_FUNCTION_INFO_V1(pt_refsys_instance);
+Datum
+pt_refsys_instance(PG_FUNCTION_ARGS){
+	POSTTIME * ptime = (POSTTIME *) PG_GETARG_POINTER(0);
+	int32 int_ret;
+	int_ret = (int32) ptime->refsys.instance;
+	PG_RETURN_INT32(int_ret);
 }
 
 PG_FUNCTION_INFO_V1(pt_regular_multi_to_multi);

@@ -82,6 +82,12 @@ VALUES
 
 SELECT * FROM pt_simpleio_table;
 
+SELECT pt_type(ptime) FROM pt_simpleio_table;
+
+SELECT pt_refsys_type(ptime) FROM pt_simpleio_table;
+
+SELECT pt_refsys_instance(ptime) FROM pt_simpleio_table;
+
 /* * * error * * */
 SELECT ('-4714')::posttime;
 SELECT ('2013/2014/2016')::posttime;

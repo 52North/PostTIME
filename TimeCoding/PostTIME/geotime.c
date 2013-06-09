@@ -9,7 +9,7 @@
 #include "calendars.h"
 #include "blackbox_converter.h"
 
-char postgis_sharedlib[50] = "0123456789ABCDEF";
+char postgis_sharedlib[50];
 
 const char * refsys_types[NUMBER_REFSYS_TYPES] = { CALENDAR_FLAG, TEMPORAL_COORDINATE_FLAG, ORDINAL_FLAG };
 
