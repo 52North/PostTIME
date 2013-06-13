@@ -29,12 +29,12 @@ SET client_min_messages TO warning;
 CREATE OR REPLACE FUNCTION posttime_in(cstring)
    RETURNS posttime
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION posttime_out(posttime)
    RETURNS cstring
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
 
 CREATE TYPE posttime (
    alignment = double,
@@ -69,7 +69,7 @@ CREATE CAST (text AS posttime)
 CREATE OR REPLACE FUNCTION posttime(timestamp with time zone)
 RETURNS posttime
 AS '$libdir/posttime', 'pt_cast_from_timestamp'
-LANGUAGE 'C' IMMUTABLE STRICT;
+LANGUAGE c IMMUTABLE STRICT;
 
 CREATE CAST (timestamp with time zone AS posttime)
     WITH FUNCTION posttime(timestamp with time zone);
@@ -77,7 +77,7 @@ CREATE CAST (timestamp with time zone AS posttime)
 CREATE OR REPLACE FUNCTION posttime(timestamp without time zone)
 RETURNS posttime
 AS '$libdir/posttime', 'pt_cast_from_timestamp'
-LANGUAGE 'C' IMMUTABLE STRICT;
+LANGUAGE c IMMUTABLE STRICT;
 
 CREATE CAST (timestamp without time zone AS posttime)
     WITH FUNCTION posttime(timestamp without time zone);
@@ -85,7 +85,7 @@ CREATE CAST (timestamp without time zone AS posttime)
 CREATE OR REPLACE FUNCTION timestamp_without_time_zone(posttime)
 RETURNS timestamp without time zone
 AS '$libdir/posttime', 'pt_cast_to_timestamp'
-LANGUAGE 'C' IMMUTABLE STRICT;
+LANGUAGE c IMMUTABLE STRICT;
 
 CREATE CAST (posttime AS timestamp without time zone )
     WITH FUNCTION timestamp_without_time_zone(posttime);
@@ -93,7 +93,7 @@ CREATE CAST (posttime AS timestamp without time zone )
 CREATE OR REPLACE FUNCTION timestamp_with_time_zone(posttime)
 RETURNS timestamp with time zone
 AS '$libdir/posttime', 'pt_cast_to_timestamp'
-LANGUAGE 'C' IMMUTABLE STRICT;
+LANGUAGE c IMMUTABLE STRICT;
 
 CREATE CAST (posttime AS timestamp with time zone)
     WITH FUNCTION timestamp_with_time_zone(posttime);
@@ -102,7 +102,7 @@ CREATE CAST (posttime AS timestamp with time zone)
 CREATE OR REPLACE FUNCTION posttime(date)
 RETURNS posttime
 AS '$libdir/posttime', 'pt_cast_from_date'
-LANGUAGE 'C' IMMUTABLE STRICT;
+LANGUAGE c IMMUTABLE STRICT;
 
 CREATE CAST (date AS posttime)
     WITH FUNCTION posttime(date);
@@ -110,7 +110,7 @@ CREATE CAST (date AS posttime)
 CREATE OR REPLACE FUNCTION date(posttime)
 RETURNS date
 AS '$libdir/posttime', 'pt_cast_to_date'
-LANGUAGE 'C' IMMUTABLE STRICT;
+LANGUAGE c IMMUTABLE STRICT;
 
 CREATE CAST (posttime AS date)
     WITH FUNCTION date(posttime);
@@ -125,12 +125,12 @@ CREATE CAST (posttime AS date)
 CREATE OR REPLACE FUNCTION pt_temporal_bbox_instance(posttime)
    RETURNS posttime
    AS '$libdir/posttime'
-   LANGUAGE 'c' STRICT;
+   LANGUAGE c STRICT;
 
 CREATE OR REPLACE FUNCTION pt_temporal_bbox(posttime, posttime)
    RETURNS posttime
    AS '$libdir/posttime' , 'pt_temporal_bbox_two_args'
-   LANGUAGE 'c' STRICT;
+   LANGUAGE c STRICT;
    
 CREATE AGGREGATE pt_temporal_bbox (posttime) (
    SFUNC = pt_temporal_bbox,
@@ -143,84 +143,84 @@ CREATE AGGREGATE pt_temporal_bbox (posttime) (
 CREATE OR REPLACE FUNCTION pt_centroid(posttime)
    RETURNS posttime
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;  
+   LANGUAGE c IMMUTABLE STRICT;  
 
 CREATE OR REPLACE FUNCTION pt_transform_system(posttime, cstring)
    RETURNS posttime
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION pt_regular_multi_to_multi(posttime)
         RETURNS posttime
         AS '$libdir/posttime'
-        LANGUAGE 'c' IMMUTABLE STRICT;
+        LANGUAGE c IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION pt_simultaneous(posttime ,posttime)
    RETURNS boolean
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
    
 CREATE OR REPLACE FUNCTION pt_overlaps(posttime ,posttime)
    RETURNS boolean
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
    
 CREATE OR REPLACE FUNCTION pt_simultaneous_excluded_end_instants(posttime ,posttime)
    RETURNS boolean
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
    
 CREATE OR REPLACE FUNCTION pt_weekday_int(posttime)
    RETURNS integer
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
    
 CREATE OR REPLACE FUNCTION pt_type(posttime)
    RETURNS integer
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;  
+   LANGUAGE c IMMUTABLE STRICT;  
    
 CREATE OR REPLACE FUNCTION pt_refsys_type(posttime)
    RETURNS integer
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;  
+   LANGUAGE c IMMUTABLE STRICT;  
    
 CREATE OR REPLACE FUNCTION pt_refsys_instance(posttime)
    RETURNS integer
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;  
+   LANGUAGE c IMMUTABLE STRICT;  
 -------------------------------------------------------------------
 -- ISO19108 basic analysis for primitives
 
 CREATE OR REPLACE FUNCTION tm_relative_position(posttime, posttime)
    RETURNS cstring
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION tm_relative_position_int(posttime, posttime)
    RETURNS integer
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
    
 CREATE OR REPLACE FUNCTION tm_distance(posttime, posttime)
    RETURNS cstring
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION tm_distance_dec_day(posttime, posttime)
    RETURNS double precision
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
    
 CREATE OR REPLACE FUNCTION tm_duration(posttime)
    RETURNS cstring
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
 
 CREATE OR REPLACE FUNCTION tm_duration_dec_day(posttime)
    RETURNS double precision
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
 
 -------------------------------------------------------------------
 -- SET RETURNING
@@ -238,12 +238,12 @@ CREATE OR REPLACE FUNCTION pt_histogram_intervals( posttime , cstring )
 CREATE OR REPLACE FUNCTION pt_successor(geometry, posttime, geometry, posttime)
    RETURNS boolean
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
    
 CREATE OR REPLACE FUNCTION pt_predecessor(geometry, posttime, geometry, posttime)
    RETURNS boolean
    AS '$libdir/posttime'
-   LANGUAGE 'c' IMMUTABLE STRICT;
+   LANGUAGE c IMMUTABLE STRICT;
 
 -------------------------------------------------------------------
 -------------------------------------------------------------------
