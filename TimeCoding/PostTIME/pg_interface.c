@@ -300,6 +300,93 @@ tm_relative_position_int(PG_FUNCTION_ARGS){
     PG_RETURN_INT32(int_ret);
 }
 
+//simple ordering functions
+
+PG_FUNCTION_INFO_V1(tm_after);
+Datum
+tm_after(PG_FUNCTION_ARGS) {
+  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	int32 int_ret = 0;
+
+	pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+	PG_RETURN_BOOL(int_ret == 12);
+}
+
+
+PG_FUNCTION_INFO_V1(tm_before);
+Datum
+tm_before(PG_FUNCTION_ARGS) {
+  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	int32 int_ret = 0;
+
+	pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+	PG_RETURN_BOOL(int_ret == 0);
+}
+
+PG_FUNCTION_INFO_V1(tm_equal);
+Datum
+tm_equal(PG_FUNCTION_ARGS) {
+  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+  POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+  int32 int_ret = 0;
+
+  pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+  PG_RETURN_BOOL(int_ret == 7);
+}
+
+PG_FUNCTION_INFO_V1(tm_gtequal);
+Datum
+tm_gtequal(PG_FUNCTION_ARGS) {
+  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+  POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+  int32 int_ret = 0;
+
+  pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+  PG_RETURN_BOOL((int_ret == 7) || (int_ret == 12));
+}
+
+PG_FUNCTION_INFO_V1(tm_ltequal);
+Datum
+tm_ltequal(PG_FUNCTION_ARGS) {
+  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+  POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+  int32 int_ret = 0;
+
+  pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+  PG_RETURN_BOOL((int_ret == 7) || (int_ret == 0));
+}
+
+
+PG_FUNCTION_INFO_V1(tm_helpfunc);
+Datum
+tm_helpfunc(PG_FUNCTION_ARGS) {
+  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+  POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+  int32 int_ret = 0;
+
+  pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+  int32 btree_ret = 3;
+  switch (int_ret) {
+  case 0:
+      btree_ret=-1;
+      break;
+  case 7:
+      btree_ret= 0;
+      break;
+  case 12:
+      btree_ret = 1;
+      break;
+  }
+  PG_RETURN_INT32(btree_ret);
+}
+
+
+
+
+//end simple ordering functions
+
 PG_FUNCTION_INFO_V1(tm_distance);
 Datum
 tm_distance(PG_FUNCTION_ARGS){

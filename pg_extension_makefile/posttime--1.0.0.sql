@@ -312,3 +312,82 @@ BEGIN
        END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+
+
+-----------------------------
+-- JIRIS NEW FANCY FUNCTIONS
+-----------------------------
+
+CREATE FUNCTION posttime_after(posttime, posttime)
+    RETURNS boolean
+    AS '$libdir/posttime', 'tm_after'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR > (
+  leftarg = posttime,
+  rightarg = posttime,
+  procedure =  posttime_after
+);
+
+
+CREATE FUNCTION posttime_before(posttime, posttime)
+    RETURNS boolean
+    AS '$libdir/posttime', 'tm_before'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR < (
+  leftarg = posttime,
+  rightarg = posttime,
+  procedure =  posttime_before
+);
+
+CREATE FUNCTION posttime_equals(posttime, posttime)
+    RETURNS boolean
+    AS '$libdir/posttime', 'tm_equal'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR = (
+    leftarg = posttime,
+    rightarg = posttime,
+    procedure =  posttime_equals
+);
+
+CREATE FUNCTION posttime_before_or_equals(posttime, posttime)
+    RETURNS boolean
+    AS '$libdir/posttime', 'tm_ltequal'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR <= (
+    leftarg = posttime,
+    rightarg = posttime,
+    procedure =  posttime_before_or_equals
+);
+
+CREATE FUNCTION posttime_after_or_equals(posttime, posttime)
+    RETURNS boolean
+    AS '$libdir/posttime', 'tm_gtequal'
+    LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR >= (
+    leftarg = posttime,
+    rightarg = posttime,
+    procedure =  posttime_after_or_equals
+);
+
+CREATE FUNCTION tm_helpfunc(posttime, posttime)
+    RETURNS integer
+    AS '$libdir/posttime', 'tm_helpfunc'
+    LANGUAGE C IMMUTABLE STRICT;
+    
+CREATE OPERATOR CLASS posttime_ops
+    DEFAULT FOR TYPE posttime USING btree AS
+        OPERATOR        1       < ,
+        OPERATOR        2       <= ,
+        OPERATOR        3       = ,
+        OPERATOR        4       >= ,
+        OPERATOR        5       > ,
+        FUNCTION        1       tm_helpfunc(posttime, posttime);
+
+
+
