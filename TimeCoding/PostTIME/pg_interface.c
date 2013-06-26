@@ -265,13 +265,7 @@ tm_relative_position(PG_FUNCTION_ARGS){
 	char * str_out = palloc(sizeof(char) * 20);
 	memset(str_out, '\0', sizeof(char) * 20);
 
-	pt_error_type ret_err = relative_position_str( ptime_1 , ptime_2 , str_out );
-	if( ret_err != NO_ERROR ){
-		FREE_MEM(str_out);
-		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-				errmsg("%s",pt_error_msgs[ret_err].msg)));
-		PG_RETURN_NULL();
-	}
+	relative_position_str( ptime_1 , ptime_2 , str_out );
 
 	int32 str_length = 0;
 	str_length = strlen(str_out);
@@ -290,12 +284,7 @@ tm_relative_position_int(PG_FUNCTION_ARGS){
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
 	int32 int_ret = 0;
 
-	pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
-	if( ret_err != NO_ERROR ){
-		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-				errmsg("%s",pt_error_msgs[ret_err].msg)));
-		PG_RETURN_NULL();
-	}
+	relative_position_rp( ptime_1 , ptime_2 , &int_ret );
 
     PG_RETURN_INT32(int_ret);
 }
@@ -309,7 +298,7 @@ tm_after(PG_FUNCTION_ARGS) {
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
 	int32 int_ret = 0;
 
-	pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+	relative_position_rp( ptime_1 , ptime_2 , &int_ret );
 	PG_RETURN_BOOL(int_ret == 12);
 }
 
@@ -321,7 +310,7 @@ tm_before(PG_FUNCTION_ARGS) {
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
 	int32 int_ret = 0;
 
-	pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+	relative_position_rp( ptime_1 , ptime_2 , &int_ret );
 	PG_RETURN_BOOL(int_ret == 0);
 }
 
@@ -332,7 +321,7 @@ tm_equal(PG_FUNCTION_ARGS) {
   POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
   int32 int_ret = 0;
 
-  pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+  relative_position_rp( ptime_1 , ptime_2 , &int_ret );
   PG_RETURN_BOOL(int_ret == 7);
 }
 
@@ -343,7 +332,7 @@ tm_gtequal(PG_FUNCTION_ARGS) {
   POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
   int32 int_ret = 0;
 
-  pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+  relative_position_rp( ptime_1 , ptime_2 , &int_ret );
   PG_RETURN_BOOL((int_ret == 7) || (int_ret == 12));
 }
 
@@ -354,7 +343,7 @@ tm_ltequal(PG_FUNCTION_ARGS) {
   POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
   int32 int_ret = 0;
 
-  pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+  relative_position_rp( ptime_1 , ptime_2 , &int_ret );
   PG_RETURN_BOOL((int_ret == 7) || (int_ret == 0));
 }
 
@@ -366,7 +355,7 @@ tm_helpfunc(PG_FUNCTION_ARGS) {
   POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
   int32 int_ret = 0;
 
-  pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
+  relative_position_rp( ptime_1 , ptime_2 , &int_ret );
   int32 btree_ret = 3;
   switch (int_ret) {
   case 0:
@@ -400,8 +389,10 @@ tm_distance(PG_FUNCTION_ARGS){
 	if( ptime_1->refsys.type == 3 || ptime_2->refsys.type == 3 ){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
-	else ret_err = distance_string( ptime_1 , ptime_2 , str_out );
-
+	else {
+		distance_string( ptime_1 , ptime_2 , str_out );
+	}
+		
 	if( ret_err != NO_ERROR ){
 		FREE_MEM(str_out);
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
@@ -431,8 +422,10 @@ tm_distance_dec_day(PG_FUNCTION_ARGS){
 	if( ptime_1->refsys.type == 3 || ptime_2->refsys.type == 3 ){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
-	else ret_err = distance_jul_day( ptime_1 , ptime_2 , &float_ret );
-
+	else {
+		distance_jul_day( ptime_1 , ptime_2 , &float_ret );
+	}
+		
 	if( ret_err != NO_ERROR ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				errmsg("%s",pt_error_msgs[ret_err].msg)));
@@ -454,8 +447,10 @@ tm_duration(PG_FUNCTION_ARGS){
 	if( ptime->refsys.type == 3 ){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
-	else ret_err = duration_string( ptime , str_out );
-
+	else {
+		duration_string( ptime , str_out );
+	}
+		
 	if( ret_err != NO_ERROR ){
 		FREE_MEM(str_out);
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
@@ -484,8 +479,10 @@ tm_duration_dec_day(PG_FUNCTION_ARGS){
 	if( ptime->refsys.type == 3 ){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
-	else ret_err = duration_jul_day( ptime , &float_ret );
-
+	else {
+		duration_jul_day( ptime , &float_ret );
+	}
+		
 	if( ret_err != NO_ERROR ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				errmsg("%s",pt_error_msgs[ret_err].msg)));

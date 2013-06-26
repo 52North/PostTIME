@@ -7,142 +7,85 @@
 
 #include "relative_position.h"
 
-/*!Set str to the adequate TM_RelativePosition string.
- * param[in] i The enumeration number.
- * param[in] str Write into this string. */
-void set_str(int32 * i, char * str){
-	switch(*i){
-	case 0:
-		strcpy(str , "Before");
-		break;
-	case 1:
-		strcpy(str , "Meets");
-		break;
-	case 2:
-		strcpy(str , "Overlaps");
-		break;
-	case 3:
-		strcpy(str , "Begins");
-		break;
-	case 4:
-		strcpy(str , "BegunBy");
-		break;
-	case 5:
-		strcpy(str , "During");
-		break;
-	case 6:
-		strcpy(str , "Contains");
-		break;
-	case 7:
-		strcpy(str , "Equals");
-		break;
-	case 8:
-		strcpy(str , "OverlappedBy");
-		break;
-	case 9:
-		strcpy(str , "Ends");
-		break;
-	case 10:
-		strcpy(str , "EndedBy");
-		break;
-	case 11:
-		strcpy(str , "MetBy");
-		break;
-	case 12:
-		strcpy(str , "After");
-		break;
-	case 13:
-		strcpy(str , "NAP");
-		break;
-	default:
-		break;
-	}
-}
 
 /*!ISO19108 relative position subroutine - case instant to instant.
- * \return int32 0\13 Allen's relationships + Not a primitive. */
-int32 relative_position_ii(POSTTIME * ptime_1,POSTTIME * ptime_2){
-	if(ptime_1->data[0] < ptime_2->data[0])return 0;
-	else if(ptime_1->data[0] == ptime_2->data[0])return 7;
-	else if(ptime_1->data[0] > ptime_2->data[0])return 12;
-	else return 13;
+ * \return rel_pos 0\13 Allen's relationships + Not a primitive. */
+rel_pos relative_position_ii(POSTTIME * ptime_1,POSTTIME * ptime_2){
+	if(ptime_1->data[0] < ptime_2->data[0])return BEFORE;
+	else if(ptime_1->data[0] == ptime_2->data[0])return EQUALS;
+	else if(ptime_1->data[0] > ptime_2->data[0])return AFTER;
+	else return NAP;
 }
 
 /*!ISO19108 relative position subroutine - case period to instant.
- * \return int32 0\13 Allen's relationships + Not a primitive. */
-int32 relative_position_pi(POSTTIME * ptime_1,POSTTIME * ptime_2){
-	if(ptime_1->data[1] < ptime_2->data[0])return 0;
-	else if(ptime_1->data[1] == ptime_2->data[0])return 10;
-	else if((ptime_1->data[0] < ptime_2->data[0]) && (ptime_1->data[1] > ptime_2->data[0]))return 6;
-	else if(ptime_1->data[0] == ptime_2->data[0])return 4;
-	else if(ptime_1->data[0] > ptime_2->data[0])return 12;
-	else return 13;
+ * \return rel_pos 0\13 Allen's relationships + Not a primitive. */
+rel_pos relative_position_pi(POSTTIME * ptime_1,POSTTIME * ptime_2){
+	if(ptime_1->data[1] < ptime_2->data[0])return BEFORE;
+	else if(ptime_1->data[1] == ptime_2->data[0])return ENDED_BY;
+	else if((ptime_1->data[0] < ptime_2->data[0]) && (ptime_1->data[1] > ptime_2->data[0]))return CONTAINS;
+	else if(ptime_1->data[0] == ptime_2->data[0])return BEGUN_BY;
+	else if(ptime_1->data[0] > ptime_2->data[0])return AFTER;
+	else return NAP;
 }
 
 /*!ISO19108 relative position subroutine - case instant to period.
- * \return int32 0\13 Allen's relationships + Not a primitive. */
-int32 relative_position_ip(POSTTIME * ptime_1,POSTTIME * ptime_2){
-	if(ptime_1->data[0] < ptime_2->data[0])return 0;
-	else if(ptime_1->data[0] == ptime_2->data[0])return 3;
-	else if(ptime_1->data[0] > ptime_2->data[0] && ptime_1->data[0] < ptime_2->data[1])return 5;
-	else if(ptime_1->data[0] == ptime_2->data[1])return 9;
-	else if(ptime_1->data[0] > ptime_2->data[1])return 12;
-	else return 13;
+ * \return rel_pos 0\13 Allen's relationships + Not a primitive. */
+rel_pos relative_position_ip(POSTTIME * ptime_1,POSTTIME * ptime_2){
+	if(ptime_1->data[0] < ptime_2->data[0])return BEFORE;
+	else if(ptime_1->data[0] == ptime_2->data[0])return BEGINS;
+	else if(ptime_1->data[0] > ptime_2->data[0] && ptime_1->data[0] < ptime_2->data[1])return DURING;
+	else if(ptime_1->data[0] == ptime_2->data[1])return ENDS;
+	else if(ptime_1->data[0] > ptime_2->data[1])return AFTER;
+	else return NAP;
 }
 
 /*!ISO19108 relative position subroutine - case period to period.
- * \return int32 0\13 Allen's relationships + Not a primitive. */
-int32 relative_position_pp(POSTTIME * ptime_1,POSTTIME * ptime_2){
-	if(ptime_1->data[1] < ptime_2->data[0])return 0;
-	else if(ptime_1->data[1] == ptime_2->data[0])return 1;
-	else if(ptime_1->data[0] < ptime_2->data[0] && ptime_1->data[1] > ptime_2->data[0] && ptime_1->data[1] < ptime_2->data[1])return 2;
-	else if(ptime_1->data[0] == ptime_2->data[0] && ptime_1->data[1] < ptime_2->data[1])return 3;
-	else if(ptime_1->data[0] == ptime_2->data[0] && ptime_1->data[1] > ptime_2->data[1])return 4;
-	else if(ptime_1->data[0] > ptime_2->data[0] && ptime_1->data[1] < ptime_2->data[1])return 5;
-	else if(ptime_1->data[0] < ptime_2->data[0] && ptime_1->data[1] > ptime_2->data[1])return 6;
-	else if(ptime_1->data[0] == ptime_2->data[0] && ptime_1->data[1] == ptime_2->data[1])return 7;
-	else if(ptime_1->data[0] > ptime_2->data[0] && ptime_1->data[0] < ptime_2->data[1] && ptime_1->data[1] > ptime_2->data[1])return 8;
-	else if(ptime_1->data[0] > ptime_2->data[0] && ptime_1->data[1] == ptime_2->data[1])return 9;
-	else if(ptime_1->data[0] < ptime_2->data[0] && ptime_1->data[1] == ptime_2->data[1])return 10;
-	else if(ptime_1->data[0] == ptime_2->data[1])return 11;
-	else if(ptime_1->data[0] > ptime_2->data[1])return 12;
-	else return 13;
+ * \return rel_pos 0\13 Allen's relationships + Not a primitive. */
+rel_pos relative_position_pp(POSTTIME * ptime_1,POSTTIME * ptime_2){
+	if(ptime_1->data[1] < ptime_2->data[0]) return BEFORE;
+	else if(ptime_1->data[1] == ptime_2->data[0]) return MEETS;
+	else if(ptime_1->data[0] < ptime_2->data[0] && ptime_1->data[1] > ptime_2->data[0] && ptime_1->data[1] < ptime_2->data[1])return OVERLAPS;
+	else if(ptime_1->data[0] == ptime_2->data[0] && ptime_1->data[1] < ptime_2->data[1])return BEGINS;
+	else if(ptime_1->data[0] == ptime_2->data[0] && ptime_1->data[1] > ptime_2->data[1])return BEGUN_BY;
+	else if(ptime_1->data[0] > ptime_2->data[0] && ptime_1->data[1] < ptime_2->data[1])return DURING;
+	else if(ptime_1->data[0] < ptime_2->data[0] && ptime_1->data[1] > ptime_2->data[1])return CONTAINS;
+	else if(ptime_1->data[0] == ptime_2->data[0] && ptime_1->data[1] == ptime_2->data[1])return EQUALS;
+	else if(ptime_1->data[0] > ptime_2->data[0] && ptime_1->data[0] < ptime_2->data[1] && ptime_1->data[1] > ptime_2->data[1])return OVERLAPPED_BY;
+	else if(ptime_1->data[0] > ptime_2->data[0] && ptime_1->data[1] == ptime_2->data[1])return ENDS;
+	else if(ptime_1->data[0] < ptime_2->data[0] && ptime_1->data[1] == ptime_2->data[1])return ENDED_BY;
+	else if(ptime_1->data[0] == ptime_2->data[1])return MET_BY;
+	else if(ptime_1->data[0] > ptime_2->data[1])return AFTER;
+	else return NAP;
 }
 
 /*!ISO19108 relative position implementation.
- * \return int32 0\12 Allen's relationships or 13= Not a primitive. */
-pt_error_type relative_position_int(POSTTIME * ptime_1,POSTTIME * ptime_2, int32 * ret_int32){
-	pt_error_type err_ret = NO_ERROR;
+ * \return rel_pos 0\12 Allen's relationships or 13= Not a primitive. */
+void relative_position_rp(POSTTIME * ptime_1,POSTTIME * ptime_2, rel_pos * ret_rp){
 	if( (ptime_1->type > 2) || (ptime_2->type > 2) ){
-		*ret_int32 = -1;
+		*ret_rp = NAP;
 	}
 	else if((ptime_1->type == 1) && (ptime_2->type == 1)){
-		*ret_int32 = relative_position_ii(ptime_1,ptime_2);
+		*ret_rp = relative_position_ii(ptime_1,ptime_2);
 	}
 	else if((ptime_1->type == 2) && (ptime_2->type == 1)){
-		*ret_int32 = relative_position_pi(ptime_1,ptime_2);
+		*ret_rp = relative_position_pi(ptime_1,ptime_2);
 	}
 	else if((ptime_1->type == 1) && (ptime_2->type == 2)){
-		*ret_int32 = relative_position_ip(ptime_1,ptime_2);
+		*ret_rp = relative_position_ip(ptime_1,ptime_2);
 	}
 	else if((ptime_1->type == 2) && (ptime_2->type == 2)){
-		*ret_int32 = relative_position_pp(ptime_1,ptime_2);
+		*ret_rp = relative_position_pp(ptime_1,ptime_2);
 	}
-	return err_ret;
 }
 
 /*!ISO19108 relative position implementation.
  * \return TM_RelativePosition enumeration type. */
-pt_error_type relative_position_str(POSTTIME * ptime_1 , POSTTIME * ptime_2 , char * str){
-	int32 rp = 13;
-	pt_error_type err_ret = relative_position_int(ptime_1 , ptime_2 , &rp);
-	if( err_ret == NO_ERROR ){
-		if(rp == -1){
-			rp = 13;
-		}
-		set_str(&rp,str);
-	}
-	return err_ret;
+void relative_position_str(POSTTIME * ptime_1 , POSTTIME * ptime_2 , char * str){
+	static const char* strings[] = { "Before", "Meets", "Overlaps", "Begins", "BegunBy", "During", "Contains", \
+		"Equals", "OverlappedBy", "Ends", "EndedBy", "MetBy", "After", "NAP"};
+	rel_pos rp = NAP;
+	relative_position_rp(ptime_1 , ptime_2 , &rp);
+	strcpy(str, strings[rp]);
 }
 
 /*! Check if two instances share a simultaneous instant.
