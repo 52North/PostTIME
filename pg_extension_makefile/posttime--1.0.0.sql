@@ -316,68 +316,68 @@ $$ LANGUAGE plpgsql;
 
 
 -----------------------------
--- JIRIS NEW FANCY FUNCTIONS
+-- SIMPLE ORDERING FUNCTIONS
 -----------------------------
 
-CREATE FUNCTION posttime_after(posttime, posttime)
+CREATE FUNCTION posttime_simple_gt(posttime, posttime)
     RETURNS boolean
-    AS '$libdir/posttime', 'tm_after'
+    AS '$libdir/posttime', 'tm_simple_gt'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR > (
   leftarg = posttime,
   rightarg = posttime,
-  procedure =  posttime_after
+  procedure =  posttime_simple_gt
 );
 
 
-CREATE FUNCTION posttime_before(posttime, posttime)
+CREATE FUNCTION posttime_simple_lt(posttime, posttime)
     RETURNS boolean
-    AS '$libdir/posttime', 'tm_before'
+    AS '$libdir/posttime', 'tm_simple_lt'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR < (
   leftarg = posttime,
   rightarg = posttime,
-  procedure =  posttime_before
+  procedure =  posttime_simple_lt
 );
 
-CREATE FUNCTION posttime_equals(posttime, posttime)
+CREATE FUNCTION posttime_simple_eq(posttime, posttime)
     RETURNS boolean
-    AS '$libdir/posttime', 'tm_equal'
+    AS '$libdir/posttime', 'tm_simple_eq'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR = (
     leftarg = posttime,
     rightarg = posttime,
-    procedure =  posttime_equals
+    procedure =  posttime_simple_eq
 );
 
-CREATE FUNCTION posttime_before_or_equals(posttime, posttime)
+CREATE FUNCTION posttime_simple_le(posttime, posttime)
     RETURNS boolean
-    AS '$libdir/posttime', 'tm_ltequal'
+    AS '$libdir/posttime', 'tm_simple_le'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR <= (
     leftarg = posttime,
     rightarg = posttime,
-    procedure =  posttime_before_or_equals
+    procedure =  posttime_simple_le
 );
 
-CREATE FUNCTION posttime_after_or_equals(posttime, posttime)
+CREATE FUNCTION posttime_simple_ge(posttime, posttime)
     RETURNS boolean
-    AS '$libdir/posttime', 'tm_gtequal'
+    AS '$libdir/posttime', 'tm_simple_ge'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR >= (
     leftarg = posttime,
     rightarg = posttime,
-    procedure =  posttime_after_or_equals
+    procedure =  posttime_simple_ge
 );
 
-CREATE FUNCTION tm_helpfunc(posttime, posttime)
+CREATE FUNCTION posttime_simple_cmp(posttime, posttime)
     RETURNS integer
-    AS '$libdir/posttime', 'tm_helpfunc'
+    AS '$libdir/posttime', 'tm_simple_cmp'
     LANGUAGE C IMMUTABLE STRICT;
     
 CREATE OPERATOR CLASS posttime_ops
@@ -387,7 +387,7 @@ CREATE OPERATOR CLASS posttime_ops
         OPERATOR        3       = ,
         OPERATOR        4       >= ,
         OPERATOR        5       > ,
-        FUNCTION        1       tm_helpfunc(posttime, posttime);
+        FUNCTION        1       posttime_simple_cmp(posttime, posttime);
 
 
 

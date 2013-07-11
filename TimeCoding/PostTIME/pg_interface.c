@@ -77,7 +77,7 @@ posttime_in(PG_FUNCTION_ARGS){
 	else size_max_needed = size_ptime + (size_jul * ( (2 * int_count)-1 ));
 	// Allocate memory for the new instance.
 	POSTTIME * ptime_tmp = palloc(size_max_needed);
-	memset(ptime_tmp,'\0', size_max_needed );
+	memset(ptime_tmp,0, size_max_needed );
 
 	pt_error_type ret_err = string_to_ptime(str_in, &int_count, ptime_tmp);
 
@@ -289,90 +289,81 @@ tm_relative_position_int(PG_FUNCTION_ARGS){
     PG_RETURN_INT32(int_ret);
 }
 
-//simple ordering functions
+//simple ordering functions (periods compared by their starting points first, then by endpoints)
 
-PG_FUNCTION_INFO_V1(tm_after);
+int tm_simple_cmp_internal(POSTTIME* this, POSTTIME* other) {
+	//compare as if instant (takes starting point of period)
+	rel_pos ret;
+	relative_position_rp(this, other, &ret);
+	switch(ret) {
+		case BEFORE:
+		case MEETS:
+		case OVERLAPS:
+		case BEGINS:
+		case CONTAINS:
+		case ENDED_BY:
+			return -1;
+		case BEGUN_BY:
+		case DURING:
+		case AFTER:
+		case MET_BY:
+		case ENDS:
+		case OVERLAPPED_BY:
+			return 1;
+		case EQUALS:		
+		default:
+			return 0;
+	}
+}
+
+PG_FUNCTION_INFO_V1(tm_simple_cmp);
 Datum
-tm_after(PG_FUNCTION_ARGS) {
-  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+tm_simple_cmp(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
-	int32 int_ret = 0;
-
-	relative_position_rp( ptime_1 , ptime_2 , &int_ret );
-	PG_RETURN_BOOL(int_ret == 12);
+	PG_RETURN_INT32(tm_simple_cmp_internal(ptime_1,ptime_2));
 }
 
-
-PG_FUNCTION_INFO_V1(tm_before);
+PG_FUNCTION_INFO_V1(tm_simple_gt);
 Datum
-tm_before(PG_FUNCTION_ARGS) {
-  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+tm_simple_gt(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
-	int32 int_ret = 0;
-
-	relative_position_rp( ptime_1 , ptime_2 , &int_ret );
-	PG_RETURN_BOOL(int_ret == 0);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) > 0);
 }
 
-PG_FUNCTION_INFO_V1(tm_equal);
+
+PG_FUNCTION_INFO_V1(tm_simple_lt);
 Datum
-tm_equal(PG_FUNCTION_ARGS) {
-  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
-  POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
-  int32 int_ret = 0;
-
-  relative_position_rp( ptime_1 , ptime_2 , &int_ret );
-  PG_RETURN_BOOL(int_ret == 7);
+tm_simple_lt(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) < 0);
 }
 
-PG_FUNCTION_INFO_V1(tm_gtequal);
+PG_FUNCTION_INFO_V1(tm_simple_eq);
 Datum
-tm_gtequal(PG_FUNCTION_ARGS) {
-  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
-  POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
-  int32 int_ret = 0;
-
-  relative_position_rp( ptime_1 , ptime_2 , &int_ret );
-  PG_RETURN_BOOL((int_ret == 7) || (int_ret == 12));
+tm_simple_eq(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) == 0);
 }
 
-PG_FUNCTION_INFO_V1(tm_ltequal);
+PG_FUNCTION_INFO_V1(tm_simple_ge);
 Datum
-tm_ltequal(PG_FUNCTION_ARGS) {
-  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
-  POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
-  int32 int_ret = 0;
-
-  relative_position_rp( ptime_1 , ptime_2 , &int_ret );
-  PG_RETURN_BOOL((int_ret == 7) || (int_ret == 0));
+tm_simple_ge(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) >= 0);
 }
 
-
-PG_FUNCTION_INFO_V1(tm_helpfunc);
+PG_FUNCTION_INFO_V1(tm_simple_le);
 Datum
-tm_helpfunc(PG_FUNCTION_ARGS) {
-  POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
-  POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
-  int32 int_ret = 0;
-
-  relative_position_rp( ptime_1 , ptime_2 , &int_ret );
-  int32 btree_ret = 3;
-  switch (int_ret) {
-  case 0:
-      btree_ret=-1;
-      break;
-  case 7:
-      btree_ret= 0;
-      break;
-  case 12:
-      btree_ret = 1;
-      break;
-  }
-  PG_RETURN_INT32(btree_ret);
+tm_simple_le(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) <= 1);
 }
-
-
-
 
 //end simple ordering functions
 

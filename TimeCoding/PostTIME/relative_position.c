@@ -61,20 +61,20 @@ rel_pos relative_position_pp(POSTTIME * ptime_1,POSTTIME * ptime_2){
 /*!ISO19108 relative position implementation.
  * \return rel_pos 0\12 Allen's relationships or 13= Not a primitive. */
 void relative_position_rp(POSTTIME * ptime_1,POSTTIME * ptime_2, rel_pos * ret_rp){
-	if( (ptime_1->type > 2) || (ptime_2->type > 2) ){
-		*ret_rp = NAP;
-	}
-	else if((ptime_1->type == 1) && (ptime_2->type == 1)){
+	if((ptime_1->type == INSTANT) && (ptime_2->type == INSTANT)){
 		*ret_rp = relative_position_ii(ptime_1,ptime_2);
 	}
-	else if((ptime_1->type == 2) && (ptime_2->type == 1)){
+	else if((ptime_1->type == PERIOD) && (ptime_2->type == INSTANT)){
 		*ret_rp = relative_position_pi(ptime_1,ptime_2);
 	}
-	else if((ptime_1->type == 1) && (ptime_2->type == 2)){
+	else if((ptime_1->type == INSTANT) && (ptime_2->type == PERIOD)){
 		*ret_rp = relative_position_ip(ptime_1,ptime_2);
 	}
-	else if((ptime_1->type == 2) && (ptime_2->type == 2)){
+	else if((ptime_1->type == PERIOD) && (ptime_2->type == PERIOD)){
 		*ret_rp = relative_position_pp(ptime_1,ptime_2);
+	}
+	else { //one or both arguments are something else than instants or periods
+		*ret_rp = NAP;
 	}
 }
 
