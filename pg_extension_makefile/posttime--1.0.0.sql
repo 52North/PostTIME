@@ -115,6 +115,25 @@ LANGUAGE c IMMUTABLE STRICT;
 CREATE CAST (posttime AS date)
     WITH FUNCTION date(posttime);
 
+    
+-- int4 (four byte integer)
+CREATE OR REPLACE FUNCTION posttime(int4)
+RETURNS posttime
+AS '$libdir/posttime', 'pt_cast_from_int32'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE CAST (int4 as posttime)
+    WITH FUNCTION posttime(int4);
+    
+CREATE OR REPLACE FUNCTION int4(posttime)
+RETURNS int4
+AS '$libdir/posttime', 'pt_cast_to_int32'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE CAST (posttime as int4)
+    WITH FUNCTION int4(posttime);
+    
+    
 -------------------------------------------------------------------
 -- BASIC DATA PROCESSING FUNCTIONALITY
 -------------------------------------------------------------------        

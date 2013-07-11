@@ -23,7 +23,7 @@ PGFunction pgis_relate_pattern;
 
 /* Less code macros */
 #define FREE_MEM(p)   do { pfree(p); (p) = NULL; } while(0);
-#define MILLIS 86400000
+#define MILLIS 86400000 //miliseconds in a day
 /* Syntax defining macros */
 #define PRIMITIVE_SEPARATOR ','
 #define PERIOD_SEPARATOR '/'
