@@ -77,7 +77,7 @@ posttime_in(PG_FUNCTION_ARGS){
 	else size_max_needed = size_ptime + (size_jul * ( (2 * int_count)-1 ));
 	// Allocate memory for the new instance.
 	POSTTIME * ptime_tmp = palloc(size_max_needed);
-	memset(ptime_tmp,'\0', size_max_needed );
+	memset(ptime_tmp,0, size_max_needed );
 
 	pt_error_type ret_err = string_to_ptime(str_in, &int_count, ptime_tmp);
 
@@ -265,13 +265,7 @@ tm_relative_position(PG_FUNCTION_ARGS){
 	char * str_out = palloc(sizeof(char) * 20);
 	memset(str_out, '\0', sizeof(char) * 20);
 
-	pt_error_type ret_err = relative_position_str( ptime_1 , ptime_2 , str_out );
-	if( ret_err != NO_ERROR ){
-		FREE_MEM(str_out);
-		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-				errmsg("%s",pt_error_msgs[ret_err].msg)));
-		PG_RETURN_NULL();
-	}
+	relative_position_str( ptime_1 , ptime_2 , str_out );
 
 	int32 str_length = 0;
 	str_length = strlen(str_out);
@@ -290,15 +284,88 @@ tm_relative_position_int(PG_FUNCTION_ARGS){
 	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
 	int32 int_ret = 0;
 
-	pt_error_type ret_err = relative_position_int( ptime_1 , ptime_2 , &int_ret );
-	if( ret_err != NO_ERROR ){
-		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-				errmsg("%s",pt_error_msgs[ret_err].msg)));
-		PG_RETURN_NULL();
-	}
+	relative_position_rp( ptime_1 , ptime_2 , &int_ret );
 
     PG_RETURN_INT32(int_ret);
 }
+
+//simple ordering functions (periods compared by their starting points first, then by endpoints)
+
+int tm_simple_cmp_internal(POSTTIME* this, POSTTIME* other) {
+	//compare as if instant (takes starting point of period)
+	rel_pos ret;
+	relative_position_rp(this, other, &ret);
+	switch(ret) {
+		case BEFORE:
+		case MEETS:
+		case OVERLAPS:
+		case BEGINS:
+		case CONTAINS:
+		case ENDED_BY:
+			return -1;
+		case BEGUN_BY:
+		case DURING:
+		case AFTER:
+		case MET_BY:
+		case ENDS:
+		case OVERLAPPED_BY:
+			return 1;
+		case EQUALS:		
+		default:
+			return 0;
+	}
+}
+
+PG_FUNCTION_INFO_V1(tm_simple_cmp);
+Datum
+tm_simple_cmp(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_INT32(tm_simple_cmp_internal(ptime_1,ptime_2));
+}
+
+PG_FUNCTION_INFO_V1(tm_simple_gt);
+Datum
+tm_simple_gt(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) > 0);
+}
+
+
+PG_FUNCTION_INFO_V1(tm_simple_lt);
+Datum
+tm_simple_lt(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) < 0);
+}
+
+PG_FUNCTION_INFO_V1(tm_simple_eq);
+Datum
+tm_simple_eq(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) == 0);
+}
+
+PG_FUNCTION_INFO_V1(tm_simple_ge);
+Datum
+tm_simple_ge(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) >= 0);
+}
+
+PG_FUNCTION_INFO_V1(tm_simple_le);
+Datum
+tm_simple_le(PG_FUNCTION_ARGS) {
+	POSTTIME * ptime_1 = (POSTTIME *) PG_GETARG_POINTER(0);
+	POSTTIME * ptime_2 = (POSTTIME *) PG_GETARG_POINTER(1);
+	PG_RETURN_BOOL(tm_simple_cmp_internal(ptime_1,ptime_2) <= 1);
+}
+
+//end simple ordering functions
 
 PG_FUNCTION_INFO_V1(tm_distance);
 Datum
@@ -313,8 +380,10 @@ tm_distance(PG_FUNCTION_ARGS){
 	if( ptime_1->refsys.type == 3 || ptime_2->refsys.type == 3 ){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
-	else ret_err = distance_string( ptime_1 , ptime_2 , str_out );
-
+	else {
+		distance_string( ptime_1 , ptime_2 , str_out );
+	}
+		
 	if( ret_err != NO_ERROR ){
 		FREE_MEM(str_out);
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
@@ -344,8 +413,10 @@ tm_distance_dec_day(PG_FUNCTION_ARGS){
 	if( ptime_1->refsys.type == 3 || ptime_2->refsys.type == 3 ){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
-	else ret_err = distance_jul_day( ptime_1 , ptime_2 , &float_ret );
-
+	else {
+		distance_jul_day( ptime_1 , ptime_2 , &float_ret );
+	}
+		
 	if( ret_err != NO_ERROR ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				errmsg("%s",pt_error_msgs[ret_err].msg)));
@@ -367,8 +438,10 @@ tm_duration(PG_FUNCTION_ARGS){
 	if( ptime->refsys.type == 3 ){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
-	else ret_err = duration_string( ptime , str_out );
-
+	else {
+		duration_string( ptime , str_out );
+	}
+		
 	if( ret_err != NO_ERROR ){
 		FREE_MEM(str_out);
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
@@ -397,8 +470,10 @@ tm_duration_dec_day(PG_FUNCTION_ARGS){
 	if( ptime->refsys.type == 3 ){
 		ret_err = ISO19108_NOT_FOR_ORDINAL_SYSTEMS;
 	}
-	else ret_err = duration_jul_day( ptime , &float_ret );
-
+	else {
+		duration_jul_day( ptime , &float_ret );
+	}
+		
 	if( ret_err != NO_ERROR ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 				errmsg("%s",pt_error_msgs[ret_err].msg)));

@@ -20,7 +20,7 @@ pt_predecessor(PG_FUNCTION_ARGS){
 	Datum datum_ret = 0;
 	bool overlaps = false;
 	bool ptime_ret = false;
-	int32 ret_relativepos = 0;
+	rel_pos ret_relativepos = NAP;
 
 	if( ptime_1->type != 2 && ptime_2->type != 2 ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
@@ -28,8 +28,8 @@ pt_predecessor(PG_FUNCTION_ARGS){
 		PG_RETURN_NULL();
 	}
 	else {
-		relative_position_int( ptime_1 , ptime_2 , &ret_relativepos);
-		if( ret_relativepos == 11 ){
+		relative_position_rp( ptime_1 , ptime_2 , &ret_relativepos);
+		if( ret_relativepos == MET_BY ){
 			text * my_pattern = palloc(sizeof(char) * 14);
 			memcpy( my_pattern->vl_dat , "T********" , 10 );
 			SET_VARSIZE( my_pattern , sizeof(char) * 14);
@@ -55,7 +55,7 @@ pt_successor(PG_FUNCTION_ARGS){
 	Datum datum_ret = 0;
 	bool overlaps = false;
 	bool ptime_ret = false;
-	int32 ret_relativepos = 0;
+	rel_pos ret_relativepos = NAP;
 
 	if( ptime_1->type != 2 && ptime_2->type != 2 ){
 		ereport(ERROR,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
@@ -63,8 +63,8 @@ pt_successor(PG_FUNCTION_ARGS){
 		PG_RETURN_NULL();
 	}
 	else {
-		relative_position_int( ptime_1 , ptime_2 , &ret_relativepos);
-		if( ret_relativepos == 1 ){
+		relative_position_rp( ptime_1 , ptime_2 , &ret_relativepos);
+		if( ret_relativepos == MEETS ){
 			text * my_pattern = palloc(sizeof(char) * 14);
 			memcpy( my_pattern->vl_dat , "T********" , 10 );
 			SET_VARSIZE( my_pattern , sizeof(char) * 14);
