@@ -23,7 +23,7 @@ PGFunction pgis_relate_pattern;
 
 /* Less code macros */
 #define FREE_MEM(p)   do { pfree(p); (p) = NULL; } while(0);
-#define MILLIS 86400000
+#define MILLIS 86400000 //miliseconds in a day
 /* Syntax defining macros */
 #define PRIMITIVE_SEPARATOR ','
 #define PERIOD_SEPARATOR '/'
@@ -51,6 +51,18 @@ typedef struct {
 	int16 instance; /*!< This refsys-instance's id */
 } REFSYS;
 
+
+typedef enum {
+	INSTANT = 1,
+	PERIOD = 2,
+	MULTIINSTANT = 3,
+	MULTIPERIOD = 4,
+	TERM_REGULARMULTIINSTANT = 5,
+	TERM_REGULARMULTIPERIOD = 6,
+	REGULARMULTIINSTANT = 7,
+	REGULARMULTIPERIOD = 8	
+} postime_type;
+
 /*!
  * The internal representation for any instance.
  * This must verify an universal interface for all objects and reference systems.
@@ -60,9 +72,7 @@ typedef struct {
 typedef struct {
         char vl_len_[4]; /*!< PostgreSQL field to store this instance's length */
         REFSYS refsys;   /*!< An ID-based approach for refsys-managment */
-        BYTE type;       /*!< Explicit store the type:
-** INSTANT=1, PERIOD=2, MULTIINSTANT=3, MULTIPERIOD=4, terminating REGULARMULTIINSTANT 5,
-** terminating REGULARMULTIPERIOD 6, REGULARMULTIINSTANT 7, REGULARMULTIPERIOD 8 */
+        postime_type type; /* type of posttime datum */
         JULIAN_DAY data[1];  /*!< This object's instants. Stored as JULIAN_DAY. */
 } POSTTIME;
 
