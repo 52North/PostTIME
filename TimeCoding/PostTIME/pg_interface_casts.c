@@ -1,6 +1,6 @@
 /*
  * pt_interface_casts.c
- *      Author: ptr
+ *      Author: ptr,jkraml
  */
 
 #include "geotime.h"
@@ -9,6 +9,8 @@ Datum pt_cast_from_timestamp(PG_FUNCTION_ARGS);
 Datum pt_cast_to_timestamp(PG_FUNCTION_ARGS);
 Datum pt_cast_from_date(PG_FUNCTION_ARGS);
 Datum pt_cast_to_date(PG_FUNCTION_ARGS);
+Datum pt_cast_from_int32(PG_FUNCTION_ARGS);
+Datum pt_cast_to_int32(PG_FUNCTION_ARGS);
 
 PG_FUNCTION_INFO_V1(pt_cast_from_timestamp);
 Datum

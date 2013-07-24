@@ -134,9 +134,9 @@ SELECT tm_relative_position_int(posttime_1, posttime_2) FROM test4posttime;
                        12
                         0
                         0
-                       -1
-                       -1
-                       -1
+                       13
+                       13
+                       13
 (39 rows)
 
 SELECT tm_relative_position('2012-7-10T10:00/2012-9-17T12:12:12.122,2012-7-10T10:00/2012-9-17T12:12:12.122','2012-7-10T10:00/2012-9-17T12:12:12.122');
@@ -160,13 +160,13 @@ SELECT tm_relative_position('TCS0012111222.345678,2111223.345678,2111224.345678'
 SELECT tm_relative_position_int('2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020','3000');
  tm_relative_position_int 
 --------------------------
-                       -1
+                       13
 (1 row)
 
 SELECT tm_relative_position_int('2010-3-12T14:23:42,2010-4-12T14:23:42', '2010-4-12T14:23:42');
  tm_relative_position_int 
 --------------------------
-                       -1
+                       13
 (1 row)
 
 SELECT tm_relative_position_int('ORD001Neoproterozoic/Ordovician','ORD001Devonian/Triassic');
